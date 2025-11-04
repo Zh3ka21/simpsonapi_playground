@@ -1,1 +1,1 @@
-# simpsonapi_playground
+# openapi_playground
