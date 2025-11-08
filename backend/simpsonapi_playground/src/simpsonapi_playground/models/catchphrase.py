@@ -7,9 +7,8 @@ from simpsonapi_playground.core.db import Base
 class Catchphrase(Base):
     __tablename__ = "catchphrases"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     phrase = Column(String)
-    
     character_id = Column(Integer, ForeignKey("characters.id"))
 
-    character = relationship("Character", backref="catchphrases")
+    character = relationship("Character", back_populates="catchphrases")

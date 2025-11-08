@@ -11,7 +11,7 @@ load_dotenv()  # Load environment variables from .env file
 #DATABASE_URL = os.getenv("DATABASE_URL")
 #SECRET_KEY = os.getenv("SECRET_KEY")
 
-DATABASE_URL = "simpsons.sqlite3"
+DATABASE_URL = "sqlite:///simpsons.sqlite3"
 SECRET_KEY = "eeb88a89682e43c37c7f3fc28afd6036"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
