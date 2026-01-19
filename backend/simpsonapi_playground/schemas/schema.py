@@ -3,39 +3,6 @@ from datetime import date
 from typing import Optional
 
 
-class ActorBase(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    cast: Optional[str] = None
-
-
-class ActorCreate(ActorBase):
-    pass
-
-
-class Actor(ActorBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
-class CharacterBase(BaseModel):
-    name: Optional[str] = None
-    actor_id: Optional[int] = None
-
-
-class CharacterCreate(CharacterBase):
-    pass
-
-
-class Character(CharacterBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
 class CatchphraseBase(BaseModel):
     phrase: Optional[str] = None
     character_id: Optional[int] = None
@@ -48,8 +15,7 @@ class CatchphraseCreate(CatchphraseBase):
 class Catchphrase(CatchphraseBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class SeasonBase(BaseModel):
@@ -70,8 +36,7 @@ class SeasonCreate(SeasonBase):
 class Season(SeasonBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class EpisodeBase(BaseModel):
@@ -90,8 +55,7 @@ class EpisodeCreate(EpisodeBase):
 class Episode(EpisodeBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class QuoteBase(BaseModel):
@@ -107,5 +71,4 @@ class QuoteCreate(QuoteBase):
 class Quote(QuoteBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
