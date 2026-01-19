@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Date, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from simpsonapi_playground.core.db import Base
+
 
 class Episode(Base):
     __tablename__ = "episodes"
