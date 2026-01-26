@@ -4,6 +4,7 @@ from simpsonapi_playground.models.actor import Actor
 from simpsonapi_playground.schemas.actors_schemas import ActorCreate, ActorResponse
 
 
+# TODO: Add safe delete
 # TODO: Admin role CRUD operations for Actor model
 def create_actor(db: Session, data: ActorCreate):
     new = Actor(**data.model_dump())

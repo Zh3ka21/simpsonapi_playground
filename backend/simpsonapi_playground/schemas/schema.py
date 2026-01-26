@@ -39,25 +39,6 @@ class Season(SeasonBase):
     model_config = {"from_attributes": True}
 
 
-class EpisodeBase(BaseModel):
-    title: Optional[str] = None
-    episode_no: Optional[int] = None
-    production_code: Optional[str] = None
-    air_date: Optional[date] = None
-    us_viewers: Optional[int] = None
-    season_id: Optional[int] = None
-
-
-class EpisodeCreate(EpisodeBase):
-    pass
-
-
-class Episode(EpisodeBase):
-    id: int
-
-    model_config = {"from_attributes": True}
-
-
 class QuoteBase(BaseModel):
     quote: Optional[str] = None
     episode_id: Optional[int] = None
