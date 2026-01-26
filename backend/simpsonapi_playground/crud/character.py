@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
+from simpsonapi_playground.models.actor import Actor
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.schemas.characters_schemas import CharacterCreate
 
@@ -17,7 +18,7 @@ def get_character(db: Session, character_id: str):
 
 
 def get_characters(db: Session):
-    return db.query(Character).all()
+    return db.query(Character).options(selectinload(Character.actor)).all()
 
 
 def get_character_by_name(db: Session, char_name=""):

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from simpsonapi_playground.schemas.actors_schemas import ActorMini
 
 
 class CharacterBase(BaseModel):
@@ -11,12 +12,6 @@ class CharacterCreate(CharacterBase):
     pass
 
 
-class CharacterGet(CharacterBase):
-    name: str
-
-    model_config = {"from_attributes": True}
-
-
 class Character(CharacterBase):
     id: int
 
@@ -26,5 +21,7 @@ class Character(CharacterBase):
 class CharacterResponse(BaseModel):
     id: int
     name: str
+
+    actor: ActorMini | None = None
 
     model_config = {"from_attributes": True}

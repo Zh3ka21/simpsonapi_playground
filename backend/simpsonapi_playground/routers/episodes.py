@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
-from simpsonapi_playground.crud import episode
 from simpsonapi_playground.schemas.episodes_schemas import (
-    EpisodeBase,
     EpisodeCreate,
     EpisodeResponse,
     EpisodeSchema,
