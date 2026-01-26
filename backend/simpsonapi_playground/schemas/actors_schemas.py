@@ -24,13 +24,6 @@ class ActorSchema(ActorBase):
     model_config = {"from_attributes": True}
 
 
-class ActorMini(BaseModel):
-    first_name: str
-    last_name: str
-
-    model_config = {"from_attributes": True}
-
-
 class ActorResponse(BaseModel):
     id: int
     first_name: str

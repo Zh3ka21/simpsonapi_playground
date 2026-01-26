@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session, selectinload
-from simpsonapi_playground.models.actor import Actor
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.schemas.characters_schemas import CharacterCreate
 

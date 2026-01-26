@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
-from simpsonapi_playground.schemas.actors_schemas import ActorMini
+
+from simpsonapi_playground.schemas.shared_schemas import ActorMini
 
 
 class CharacterBase(BaseModel):

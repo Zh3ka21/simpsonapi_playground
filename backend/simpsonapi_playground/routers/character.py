@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
+from simpsonapi_playground.crud.actor import get_actor_based_on_char
 from simpsonapi_playground.schemas.characters_schemas import (
     Character,
     CharacterCreate,
@@ -14,6 +15,7 @@ from simpsonapi_playground.crud.character import (
     put_character,
     del_character,
 )
+from simpsonapi_playground.schemas.shared_schemas import ActorMini
 
 router = APIRouter(prefix="/characters", tags=["characters"])
 
@@ -64,3 +66,11 @@ def change_character_router(
 )
 def delete_character_router(char_id: int = None, db: Session = Depends(get_db)):
     del_character(db, char_id)
+
+
+@router.get("/{character_id}/actors", response_model=list[ActorMini])
+def get_actors_for_character(
+    character_id: int,
+    db: Session = Depends(get_db),
+):
+    return get_actor_based_on_char(db, character_id)
