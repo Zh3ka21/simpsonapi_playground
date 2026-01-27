@@ -3,21 +3,6 @@ from datetime import date
 from typing import Optional
 
 
-class CatchphraseBase(BaseModel):
-    phrase: Optional[str] = None
-    character_id: Optional[int] = None
-
-
-class CatchphraseCreate(CatchphraseBase):
-    pass
-
-
-class Catchphrase(CatchphraseBase):
-    id: int
-
-    model_config = {"from_attributes": True}
-
-
 class SeasonBase(BaseModel):
     number: Optional[int] = None
     year_start: Optional[int] = None
