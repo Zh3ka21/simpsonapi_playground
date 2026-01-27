@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
 from simpsonapi_playground.crud.actor import get_actor_based_on_char
+from simpsonapi_playground.crud.quotes import get_character_quotes
 from simpsonapi_playground.schemas.characters_schemas import (
     Character,
     CharacterCreate,
@@ -15,6 +16,7 @@ from simpsonapi_playground.crud.character import (
     put_character,
     del_character,
 )
+from simpsonapi_playground.schemas.quotes_schemas import QuoteResponse
 from simpsonapi_playground.schemas.shared_schemas import ActorMini
 
 router = APIRouter(prefix="/characters", tags=["characters"])
@@ -74,3 +76,8 @@ def get_actors_for_character(
     db: Session = Depends(get_db),
 ):
     return get_actor_based_on_char(db, character_id)
+
+
+@router.get("/{character_id}/quotes", response_model=list[QuoteResponse])
+def get_characters_quotes_router(character_id: int, db: Session = Depends(get_db)):
+    return get_character_quotes(db, character_id)

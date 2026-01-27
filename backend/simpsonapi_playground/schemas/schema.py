@@ -22,19 +22,3 @@ class Season(SeasonBase):
     id: int
 
     model_config = {"from_attributes": True}
-
-
-class QuoteBase(BaseModel):
-    quote: Optional[str] = None
-    episode_id: Optional[int] = None
-    character_id: Optional[int] = None
-
-
-class QuoteCreate(QuoteBase):
-    pass
-
-
-class Quote(QuoteBase):
-    id: int
-
-    model_config = {"from_attributes": True}

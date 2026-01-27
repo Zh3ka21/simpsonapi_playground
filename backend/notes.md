@@ -7,3 +7,7 @@
 7. Pagination
 8. Add season description(AI tools/Google search/Api Request)
 9. Change URL ADDRESSES TO REST
+10. Docker + Kubernetes
+11. Migration to POSTGRESQL/MYSQL
+12. Microservices(Authorisation + Logging)
+13. Review episode schema

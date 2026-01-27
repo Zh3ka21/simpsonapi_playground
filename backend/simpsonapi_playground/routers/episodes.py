@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
+
 from simpsonapi_playground.schemas.episodes_schemas import (
     EpisodeCreate,
     EpisodeResponse,
@@ -23,6 +24,11 @@ router = APIRouter(prefix="/episodes", tags=["episodes"])
 @router.post("/", response_model=EpisodeSchema, status_code=status.HTTP_201_CREATED)
 def create_episode_router(episode: EpisodeCreate, db: Session = Depends(get_db)):
     return create_episode(db, episode)
+
+
+@router.get("/random", response_model=EpisodeResponse)
+def get_random_episode_router(db: Session = Depends(get_db)):
+    return select_random_episode(db)
 
 
 @router.get("/{episode_id}", response_model=EpisodeResponse)
@@ -62,8 +68,3 @@ def delete_episode(episode_id: int = None, db: Session = Depends(get_db)):
 @router.get("/{episode_id}/season")
 def get_season_by_episode_router(episode_id: int, db: Session = Depends(get_db)):
     return get_season_by_episode(db, episode_id)
-
-
-@router.get("/random", response_model=EpisodeResponse)
-def get_random_episode_router(db: Session = Depends(get_db)):
-    return select_random_episode(db)
