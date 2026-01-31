@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
 from simpsonapi_playground.crud.actor import (
     create_actor,
     del_actor,
-    get_character_based_on_actor,
+    get_characters_based_on_actor,
     read_actor,
     read_actors,
     update_actor,
@@ -13,7 +13,9 @@ from simpsonapi_playground.schemas.actors_schemas import (
     ActorSchema,
     ActorCreate,
     ActorResponse,
+    PaginatedActors,
 )
+from simpsonapi_playground.schemas.characters_schemas import PaginatedCharacters
 from simpsonapi_playground.schemas.shared_schemas import ActorMini
 
 router = APIRouter(prefix="/actors", tags=["actors"])
@@ -24,9 +26,16 @@ def create_an_actor(actor: ActorCreate, db: Session = Depends(get_db)):
     return create_actor(db, actor)
 
 
-@router.get("/", response_model=list[ActorMini])
-def read_all_actors(db: Session = Depends(get_db)):
-    return read_actors(db)
+@router.get("/", response_model=PaginatedActors)
+def read_all_actors(
+    db: Session = Depends(get_db),
+    limit: int = Query(10, ge=1, le=20),
+    offset: int = Query(0, ge=0),
+    sort: str = Query("id", pattern="^(id|first_name|last_name|cast)$"),
+    order: str = Query("asc", pattern="^(asc|desc)$"),
+):
+    items, total = read_actors(db, limit=limit, offset=offset, sort=sort, order=order)
+    return {"items": items, "total": total, "limit": limit, "offset": offset}
 
 
 @router.get("/{actor_id}", response_model=ActorSchema)
@@ -42,11 +51,26 @@ def upd_actor(actor_id: int, data: ActorCreate, db: Session = Depends(get_db)):
     return upd_actor
 
 
+# TODO: Referential integrity (prevent deleting actors with characters), Safe delete
 @router.delete("/{actor_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_actor(actor_id: int, db: Session = Depends(get_db)):
     del_actor(db, actor_id)
 
 
-@router.get("/{actor_id}/characters", response_model=ActorResponse)
-def get_characters_played_by_actor(db: Session = Depends(get_db), actor_id: int = None):
-    return get_character_based_on_actor(db, actor_id)
+@router.get("/{actor_id}/characters", response_model=PaginatedCharacters)
+def get_characters_played_by_actor(
+    db: Session = Depends(get_db),
+    actor_id: int = 0,
+    limit: int = Query(10, ge=1, le=20),
+    offset: int = Query(0, ge=0),
+):
+    items, total = get_characters_based_on_actor(
+        db, actor_id, limit=limit, offset=offset
+    )
+
+    return {
+        "items": items,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }

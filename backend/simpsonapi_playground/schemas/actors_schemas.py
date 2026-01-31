@@ -33,3 +33,10 @@ class ActorResponse(BaseModel):
     characters: list[CharacterMini] = []
 
     model_config = {"from_attributes": True}
+
+
+class PaginatedActors(BaseModel):
+    items: list[ActorSchema]
+    total: int
+    limit: int
+    offset: int

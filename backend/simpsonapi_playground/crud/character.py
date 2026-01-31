@@ -16,6 +16,15 @@ def get_character(db: Session, character_id: str):
     return db.query(Character).filter(Character.id == character_id).first()
 
 
+def suggest_character_by_name(db: Session, query: str):
+    return (
+        db.query(Character)
+        .filter(Character.name.ilike(f"%{query}%"))
+        .order_by(Character.name.asc())
+        .first()
+    )
+
+
 def get_characters(db: Session):
     return db.query(Character).options(selectinload(Character.actor)).all()
 

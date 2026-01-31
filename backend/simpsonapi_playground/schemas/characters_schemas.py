@@ -13,12 +13,6 @@ class CharacterCreate(CharacterBase):
     pass
 
 
-class Character(CharacterBase):
-    id: int
-
-    model_config = {"from_attributes": True}
-
-
 class CharacterResponse(BaseModel):
     id: int
     name: str
@@ -26,3 +20,10 @@ class CharacterResponse(BaseModel):
     actor: ActorMini | None = None
 
     model_config = {"from_attributes": True}
+
+
+class PaginatedCharacters(BaseModel):
+    items: list[CharacterResponse]
+    total: int
+    limit: int
+    offset: int

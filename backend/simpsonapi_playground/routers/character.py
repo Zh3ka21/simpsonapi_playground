@@ -4,7 +4,6 @@ from simpsonapi_playground.core.db import get_db
 from simpsonapi_playground.crud.actor import get_actor_based_on_char
 from simpsonapi_playground.crud.quotes import get_character_quotes
 from simpsonapi_playground.schemas.characters_schemas import (
-    Character,
     CharacterCreate,
     CharacterResponse,
 )
@@ -15,6 +14,7 @@ from simpsonapi_playground.crud.character import (
     get_characters,
     put_character,
     del_character,
+    suggest_character_by_name,
 )
 from simpsonapi_playground.schemas.quotes_schemas import QuoteResponse
 from simpsonapi_playground.schemas.shared_schemas import ActorMini
@@ -24,14 +24,14 @@ router = APIRouter(prefix="/characters", tags=["characters"])
 
 @router.post(
     "/",
-    response_model=Character,
+    response_model=CharacterResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def create_character_router(character: CharacterCreate, db: Session = Depends(get_db)):
     return create_character(db, character)
 
 
-@router.get("/{character_id}", response_model=Character)
+@router.get("/{character_id}", response_model=CharacterResponse)
 def read_one_character_router(character_id: int, db: Session = Depends(get_db)):
     db_character = get_character(db, character_id)
     if not db_character:
@@ -41,18 +41,23 @@ def read_one_character_router(character_id: int, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=list[CharacterResponse])
 def read_characters_router(
-    name: str | None = None,
+    name_exact: str | None = None,
+    q: str | None = None,
     db: Session = Depends(get_db),
 ):
-    if name:
-        character = get_character_by_name(db, name)
+    if name_exact:
+        character = get_character_by_name(db, name_exact)
         if not character:
             raise HTTPException(status_code=404, detail="Character not found")
         return [character]
+
+    if q:
+        return [suggest_character_by_name(db, q)]
+
     return get_characters(db)
 
 
-@router.put("/{char_id}", response_model=Character)
+@router.put("/{char_id}", response_model=CharacterResponse)
 def change_character_router(
     char_id: int = None, data: CharacterCreate = None, db: Session = Depends(get_db)
 ):

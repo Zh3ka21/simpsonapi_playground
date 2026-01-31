@@ -1,7 +1,9 @@
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session
+from sqlalchemy import asc, desc
 
 from simpsonapi_playground.models.actor import Actor
-from simpsonapi_playground.schemas.actors_schemas import ActorCreate, ActorResponse
+from simpsonapi_playground.models.character import Character
+from simpsonapi_playground.schemas.actors_schemas import ActorCreate
 
 
 # TODO: Add safe delete
@@ -14,8 +16,29 @@ def create_actor(db: Session, data: ActorCreate):
     return new
 
 
-def read_actors(db: Session):
-    return db.query(Actor).all()
+def read_actors(
+    db: Session,
+    limit: int,
+    offset: int,
+    sort: str,
+    order: str,
+):
+    base_query = db.query(Actor)
+    total = base_query.count()
+
+    sort_column_map = {
+        "id": Actor.id,
+        "first_name": Actor.first_name,
+        "last_name": Actor.last_name,
+        "cast": Actor.cast,
+    }
+    sort_column = sort_column_map.get(sort, Actor.first_name)
+    if order == "asc":
+        base_query = base_query.order_by(asc(sort_column), asc(Actor.id))
+    else:
+        base_query = base_query.order_by(desc(sort_column), asc(Actor.id))
+
+    return (base_query.offset(offset).limit(limit).all(), total)
 
 
 def read_actor(db: Session, actor_id: int):
@@ -40,13 +63,19 @@ def del_actor(db: Session, character_id: int):
     db.commit()
 
 
-def get_character_based_on_actor(db: Session, actor_id: int) -> ActorResponse:
-    return (
-        db.query(Actor)
-        .options(selectinload(Actor.characters))
-        .filter(Actor.id == actor_id)
-        .first()
-    )
+def get_characters_based_on_actor(
+    db: Session,
+    actor_id: int,
+    limit: int,
+    offset: int,
+):
+    base_query = db.query(Character).filter(Character.actor_id == actor_id)
+
+    total = base_query.count()
+
+    items = base_query.order_by(asc(Character.id)).offset(offset).limit(limit).all()
+
+    return items, total
 
 
 def get_actor_based_on_char(db: Session, character_id: int):
