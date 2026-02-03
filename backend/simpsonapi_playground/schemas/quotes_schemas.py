@@ -28,3 +28,12 @@ class QuoteSchema(QuoteBase):
     id: int
 
     model_config = {"from_attributes": True}
+
+
+class PaginatedQuotesResponse(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    items: list[QuoteResponse]
+
+    model_config = {"from_attributes": True}

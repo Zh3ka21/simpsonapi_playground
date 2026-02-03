@@ -25,8 +25,22 @@ def suggest_character_by_name(db: Session, query: str):
     )
 
 
-def get_characters(db: Session):
-    return db.query(Character).options(selectinload(Character.actor)).all()
+def get_characters(db: Session, limit: int, offset: int):
+    base_query = db.query(Character)
+    total = base_query.count()
+
+    chars = (
+        base_query.options(selectinload(Character.actor))
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return {
+        "items": chars,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
 
 
 def get_character_by_name(db: Session, char_name=""):

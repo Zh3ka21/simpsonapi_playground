@@ -6,6 +6,7 @@ from simpsonapi_playground.schemas.episodes_schemas import (
     EpisodeCreate,
     EpisodeResponse,
     EpisodeSchema,
+    PaginatedEpisodes,
 )
 from simpsonapi_playground.crud.episode import (
     create_episode,
@@ -39,14 +40,19 @@ def get_episode_router(episode_id: int, db: Session = Depends(get_db)):
     return db_episode
 
 
-@router.get("/", response_model=list[EpisodeSchema])
-def get_episodes_router(db: Session = Depends(get_db), title: str | None = None):
+@router.get("/", response_model=PaginatedEpisodes)
+def get_episodes_router(
+    db: Session = Depends(get_db),
+    title: str | None = None,
+    limit: int = 10,
+    offset: int = 0,
+):
     if title:
         episode = get_episode_by_name(db, title)
         if not episode:
             raise HTTPException(status_code=404, detail="Episode not found")
         return [episode]
-    return get_episodes(db)
+    return get_episodes(db, limit=limit, offset=offset)
 
 
 @router.put("/{episode_id}", response_model=EpisodeResponse)

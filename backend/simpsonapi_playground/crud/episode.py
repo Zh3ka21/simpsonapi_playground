@@ -18,13 +18,19 @@ def get_episode(db: Session, episode_id: int):
     return db.query(Episode).filter(Episode.id == episode_id).first()
 
 
-# TODO: Pagination
-def get_episodes(db: Session):
-    return (
-        db.query(Episode)
-        .options(selectinload(Episode.season), selectinload(Episode.quotes))
-        .all()
+def get_episodes(db: Session, limit: int = 10, offset: int = 0):
+    base_query = db.query(Episode).options(
+        selectinload(Episode.season), selectinload(Episode.quotes)
     )
+    total = base_query.count()
+    items = base_query.limit(limit).offset(offset).all()
+
+    return {
+        "items": items,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
 
 
 def get_episode_by_name(db: Session, episode_title=""):
@@ -63,10 +69,20 @@ def get_season_by_episode(db: Session, episode_id: int):
     )
 
 
-def get_episodes_by_season(db: Session, season_id: int):
-    return (
+def get_episodes_by_season(
+    db: Session, season_id: int, limit: int = 10, offset: int = 0
+):
+    base_query = (
         db.query(Episode)
         .options(selectinload(Episode.season))
         .filter(Episode.season_id == season_id)
-        .all()
     )
+    total = base_query.count()
+    items = base_query.limit(limit).offset(offset).all()
+
+    return {
+        "items": items,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }

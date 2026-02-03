@@ -19,9 +19,23 @@ def add_catchphrase_to_character(
 
 
 def get_catchphrases_for_character(
-    db: Session, character_id: int, character: Character
+    db: Session,
+    character_id: int,
+    character: Character,
+    limit: int,
+    offset: int,
 ):
     if not character:
         raise ValueError(f"Character with ID {character_id} does not exist.")
 
-    return db.query(Catchphrase).filter(Catchphrase.character_id == character_id).all()
+    base_query = db.query(Catchphrase).filter(Catchphrase.character_id == character_id)
+    total = base_query.count()
+
+    catchphrases = base_query.order_by(Catchphrase.id).offset(offset).limit(limit).all()
+
+    return {
+        "items": catchphrases,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }

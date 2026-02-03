@@ -21,6 +21,13 @@ class EpisodeSchema(EpisodeBase):
     model_config = {"from_attributes": True}
 
 
+class PaginatedEpisodes(BaseModel):
+    items: List[EpisodeSchema]
+    total: int
+    limit: int
+    offset: int
+
+
 class EpisodeResponse(EpisodeBase):
     id: int
     season: Optional[SeasonBase] = None

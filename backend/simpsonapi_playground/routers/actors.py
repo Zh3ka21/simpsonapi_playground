@@ -12,11 +12,9 @@ from simpsonapi_playground.crud.actor import (
 from simpsonapi_playground.schemas.actors_schemas import (
     ActorSchema,
     ActorCreate,
-    ActorResponse,
     PaginatedActors,
 )
 from simpsonapi_playground.schemas.characters_schemas import PaginatedCharacters
-from simpsonapi_playground.schemas.shared_schemas import ActorMini
 
 router = APIRouter(prefix="/actors", tags=["actors"])
 

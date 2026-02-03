@@ -19,3 +19,10 @@ class CatchphraseSchema(CatchphraseBase):
     id: int
 
     model_config = {"from_attributes": True}
+
+
+class PaginatedCatchphrases(BaseModel):
+    items: list[CatchphraseSchema]
+    total: int
+    limit: int
+    offset: int

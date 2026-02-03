@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
 from simpsonapi_playground.crud.actor import get_actor_based_on_char
@@ -6,6 +6,7 @@ from simpsonapi_playground.crud.quotes import get_character_quotes
 from simpsonapi_playground.schemas.characters_schemas import (
     CharacterCreate,
     CharacterResponse,
+    PaginatedCharacters,
 )
 from simpsonapi_playground.crud.character import (
     create_character,
@@ -16,7 +17,9 @@ from simpsonapi_playground.crud.character import (
     del_character,
     suggest_character_by_name,
 )
-from simpsonapi_playground.schemas.quotes_schemas import QuoteResponse
+from simpsonapi_playground.schemas.quotes_schemas import (
+    PaginatedQuotesResponse,
+)
 from simpsonapi_playground.schemas.shared_schemas import ActorMini
 
 router = APIRouter(prefix="/characters", tags=["characters"])
@@ -39,11 +42,13 @@ def read_one_character_router(character_id: int, db: Session = Depends(get_db)):
     return db_character
 
 
-@router.get("/", response_model=list[CharacterResponse])
+@router.get("/", response_model=PaginatedCharacters)
 def read_characters_router(
     name_exact: str | None = None,
     q: str | None = None,
     db: Session = Depends(get_db),
+    limit: int = Query(10, ge=1, le=20),
+    offset: int = Query(0, ge=0),
 ):
     if name_exact:
         character = get_character_by_name(db, name_exact)
@@ -54,7 +59,7 @@ def read_characters_router(
     if q:
         return [suggest_character_by_name(db, q)]
 
-    return get_characters(db)
+    return get_characters(db, limit, offset)
 
 
 @router.put("/{char_id}", response_model=CharacterResponse)
@@ -76,13 +81,18 @@ def delete_character_router(char_id: int = None, db: Session = Depends(get_db)):
 
 
 @router.get("/{character_id}/actors", response_model=list[ActorMini])
-def get_actors_for_character(
+def get_actor_for_character(
     character_id: int,
     db: Session = Depends(get_db),
 ):
     return get_actor_based_on_char(db, character_id)
 
 
-@router.get("/{character_id}/quotes", response_model=list[QuoteResponse])
-def get_characters_quotes_router(character_id: int, db: Session = Depends(get_db)):
-    return get_character_quotes(db, character_id)
+@router.get("/{character_id}/quotes", response_model=PaginatedQuotesResponse)
+def get_characters_quotes_router(
+    character_id: int,
+    db: Session = Depends(get_db),
+    limit: int = Query(10, ge=1, le=20),
+    offset: int = Query(0, ge=0),
+):
+    return get_character_quotes(db, character_id, limit=limit, offset=offset)
