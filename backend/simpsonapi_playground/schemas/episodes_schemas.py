@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-from simpsonapi_playground.schemas.schema import SeasonBase
+from simpsonapi_playground.schemas.seasons_schemas import SeasonBase
 from simpsonapi_playground.schemas.quotes_schemas import QuoteBase
 
 

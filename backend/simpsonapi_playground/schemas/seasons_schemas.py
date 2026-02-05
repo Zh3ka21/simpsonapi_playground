@@ -16,9 +16,3 @@ class SeasonBase(BaseModel):
 
 class SeasonCreate(SeasonBase):
     pass
-
-
-class Season(SeasonBase):
-    id: int
-
-    model_config = {"from_attributes": True}

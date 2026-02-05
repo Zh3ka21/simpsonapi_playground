@@ -12,17 +12,13 @@ class CatchphraseCreate(CatchphraseBase):
 
 
 class CatchphraseResponse(CatchphraseBase):
-    pass
-
-
-class CatchphraseSchema(CatchphraseBase):
     id: int
 
     model_config = {"from_attributes": True}
 
 
 class PaginatedCatchphrases(BaseModel):
-    items: list[CatchphraseSchema]
+    items: list[CatchphraseResponse]
     total: int
     limit: int
     offset: int

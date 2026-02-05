@@ -4,7 +4,7 @@ from simpsonapi_playground.core.db import get_db
 
 from simpsonapi_playground.crud.character import get_character
 from simpsonapi_playground.schemas.catchphrase_schemas import (
-    CatchphraseSchema,
+    CatchphraseResponse,
     PaginatedCatchphrases,
 )
 from simpsonapi_playground.crud.catchphrase import (
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/catchphrases", tags=["catchphrases"])
 @router.post(
     "/{character_id}/catchphrase",
     status_code=status.HTTP_201_CREATED,
-    response_model=CatchphraseSchema,
+    response_model=CatchphraseResponse,
 )
 def add_catchphrase_to_character_router(
     character_id: int,
@@ -30,6 +30,7 @@ def add_catchphrase_to_character_router(
     return add_catchphrase_to_character(db, character_id, catchphrase, character)
 
 
+# TODO: Review this function add functionality to get all catchphrases
 @router.get("/{character_id}/catchphrase", response_model=PaginatedCatchphrases)
 def get_catchphrases_for_character_router(
     character_id: int,
