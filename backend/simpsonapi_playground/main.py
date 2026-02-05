@@ -5,6 +5,7 @@ from simpsonapi_playground.routers.episodes import router as episode_router
 from simpsonapi_playground.routers.catchphrases import router as catchphrase_router
 from simpsonapi_playground.routers.quotes import router as quotes_router
 from simpsonapi_playground.routers.seasons import router as seasons_router
+from simpsonapi_playground.routers.stats import router as stats_router
 
 # import simpsonapi_playground.models
 
@@ -16,6 +17,7 @@ app.include_router(episode_router)
 app.include_router(catchphrase_router)
 app.include_router(quotes_router)
 app.include_router(seasons_router)
+app.include_router(stats_router)
 
 app = FastAPI(title="OpenAPI Playground")
 
@@ -25,6 +27,7 @@ app.include_router(episode_router)
 app.include_router(catchphrase_router)
 app.include_router(quotes_router)
 app.include_router(seasons_router)
+app.include_router(stats_router)
 
 
 @app.get("/")
