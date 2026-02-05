@@ -1,3 +1,4 @@
+from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -16,10 +17,18 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 
 
 @router.get("/character/most-quoted", response_model=StatsCharacterMostQuoted)
-def most_quoted_character(db: Session = Depends(get_db)):
-    return get_most_quoted_character(db)
+def most_quoted_character(
+    db: Session = Depends(get_db),
+) -> dict[str, Any] | None:
+    quoted_char = get_most_quoted_character(db)
+    if not quoted_char:
+        return None
+    return quoted_char
 
 
 @router.get("/episode/most-quoted", response_model=StatsEpisodeMostQuoted)
-def most_quoted_episode(db: Session = Depends(get_db)):
-    return get_most_quoted_episode(db)
+def most_quoted_episode(db: Session = Depends(get_db)) -> dict[str, Any] | None:
+    quoted_episode = get_most_quoted_episode(db)
+    if not quoted_episode:
+        return None
+    return quoted_episode

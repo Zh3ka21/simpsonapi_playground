@@ -1,19 +1,21 @@
 # TODO List
 
-1. Make use of UUID
-2. Admin role
-
-3. Status codes instead of objects returned
-4. Error Handling
-5. Safe Delete
-6. Pagination
-7. Add season description(AI tools/Google search/Api Request)
-8. Change URL ADDRESSES TO REST
-9. Docker + Kubernetes
-10. Migration to POSTGRESQL/MYSQL
-11. Microservices(Authorisation + Logging)
-12. Review episode schema
-13.
+0. Asyncs
+1. Review delete cruds/routers(fix one return object another different https)
+2. Make use of UUID
+3. Admin role
+4. Status codes instead of objects returned
+5. Annotation fix instead of dict, schemas
+6. Error Handling ( Checks on successful returning/updating/creating information)
+7. Safe Delete
+8. Pagination
+9. Add season description(AI tools/Google search/Api Request)
+10. Change URL ADDRESSES TO REST
+11. Docker + Kubernetes
+12. Migration to POSTGRESQL/MYSQL
+13. Microservices(Authorisation + Logging)
+14. Review episode schema
+15.
 
 ```markdown
     15. Bulk Quote Import

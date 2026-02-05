@@ -1,3 +1,4 @@
+from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
@@ -12,5 +13,5 @@ router = APIRouter(prefix="/quotes", tags=["quotes"])
 @router.get("/{episode_id}", response_model=PaginatedQuotesResponse)
 def get_quotes_for_episode_router(
     episode_id: int, db: Session = Depends(get_db), limit: int = 10, offset: int = 0
-):
+) -> dict[str, Any]:
     return get_quotes_for_episode(db, episode_id, limit=limit, offset=offset)

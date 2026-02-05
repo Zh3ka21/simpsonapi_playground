@@ -15,6 +15,27 @@ sqlalchemy = ">=2.0.44,<3.0.0"
 passlib = ">=1.7.4,<2.0.0"
 uvicorn = ">=0.38.0,<0.39.0"
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.19.1"
+ruff = "^0.15.0"
+pre-commit = "^4.5.1"
+
+[tool.mypy]
+files = "simpsonapi_playground"
+ignore_missing_imports = true
+show_error_codes = true
+strict = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["simpsonapi_playground"]
+exclude = ["tests/fixtures", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90"]
+ignore = ["F401", "W291"]
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

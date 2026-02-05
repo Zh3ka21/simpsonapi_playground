@@ -1,11 +1,13 @@
+from typing import Dict, List, Union
 from sqlalchemy.orm import Session
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.models.catchphrase import Catchphrase
+from simpsonapi_playground.schemas.catchphrase_schemas import CatchphraseResponse
 
 
 def add_catchphrase_to_character(
     db: Session, character_id: int, phrase: str, character: Character
-):
+) -> Catchphrase | None:
     if not character:
         raise ValueError(f"Character with ID {character_id} does not exist.")
 
@@ -13,7 +15,7 @@ def add_catchphrase_to_character(
 
     db.add(new_catchphrase)
     db.commit()
-    db.refresh(character)
+    db.refresh(new_catchphrase)
 
     return new_catchphrase
 
@@ -24,7 +26,7 @@ def get_catchphrases_for_character(
     character: Character,
     limit: int,
     offset: int,
-):
+) -> Dict[str, Union[List[Catchphrase], int]]:
     if not character:
         raise ValueError(f"Character with ID {character_id} does not exist.")
 

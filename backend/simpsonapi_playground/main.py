@@ -7,7 +7,6 @@ from simpsonapi_playground.routers.quotes import router as quotes_router
 from simpsonapi_playground.routers.seasons import router as seasons_router
 from simpsonapi_playground.routers.stats import router as stats_router
 
-# import simpsonapi_playground.models
 
 app = FastAPI()
 
@@ -31,5 +30,5 @@ app.include_router(stats_router)
 
 
 @app.get("/")
-def root():
+def root() -> dict[str, str]:
     return {"message": "Hello from OpenAPI Playground"}

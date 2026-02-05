@@ -1,8 +1,10 @@
+from typing import Dict, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
 
 from simpsonapi_playground.crud.character import get_character
+from simpsonapi_playground.models.catchphrase import Catchphrase
 from simpsonapi_playground.schemas.catchphrase_schemas import (
     CatchphraseResponse,
     PaginatedCatchphrases,
@@ -25,8 +27,10 @@ def add_catchphrase_to_character_router(
     character_id: int,
     catchphrase: str,
     db: Session = Depends(get_db),
-):
+) -> Catchphrase | None:
     character = get_character(db, character_id)
+    if character is None:
+        raise HTTPException(status_code=404, detail="Character not found")
     return add_catchphrase_to_character(db, character_id, catchphrase, character)
 
 
@@ -37,7 +41,7 @@ def get_catchphrases_for_character_router(
     db: Session = Depends(get_db),
     limit: int = 10,
     offset: int = 0,
-):
+) -> Dict[str, List[Catchphrase] | int]:
     character = get_character(db, character_id)
     if not character:
         raise HTTPException(status_code=404, detail="Character not found")

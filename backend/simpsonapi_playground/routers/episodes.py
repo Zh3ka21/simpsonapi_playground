@@ -1,7 +1,9 @@
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.db import get_db
 
+from simpsonapi_playground.models.episode import Episode
 from simpsonapi_playground.schemas.episodes_schemas import (
     EpisodeCreate,
     EpisodeResponse,
@@ -23,17 +25,21 @@ router = APIRouter(prefix="/episodes", tags=["episodes"])
 
 
 @router.post("/", response_model=EpisodeSchema, status_code=status.HTTP_201_CREATED)
-def create_episode_router(episode: EpisodeCreate, db: Session = Depends(get_db)):
+def create_episode_router(
+    episode: EpisodeCreate, db: Session = Depends(get_db)
+) -> Episode | None:
     return create_episode(db, episode)
 
 
 @router.get("/random", response_model=EpisodeResponse)
-def get_random_episode_router(db: Session = Depends(get_db)):
+def get_random_episode_router(db: Session = Depends(get_db)) -> Episode | None:
     return select_random_episode(db)
 
 
 @router.get("/{episode_id}", response_model=EpisodeResponse)
-def get_episode_router(episode_id: int, db: Session = Depends(get_db)):
+def get_episode_router(
+    episode_id: int, db: Session = Depends(get_db)
+) -> Episode | None:
     db_episode = get_episode(db, episode_id)
     if not db_episode:
         raise HTTPException(status_code=404, detail="Episode not found")
@@ -46,7 +52,7 @@ def get_episodes_router(
     title: str | None = None,
     limit: int = 10,
     offset: int = 0,
-):
+) -> dict[str, Any] | list[Episode] | None:
     if title:
         episode = get_episode_by_name(db, title)
         if not episode:
@@ -58,7 +64,7 @@ def get_episodes_router(
 @router.put("/{episode_id}", response_model=EpisodeResponse)
 def update_episode_router(
     episode_id: int, data: EpisodeCreate, db: Session = Depends(get_db)
-):
+) -> Episode | None:
     upd_episode = put_episode(db, episode_id, data)
     if not upd_episode:
         raise HTTPException(status_code=404, detail="Episode was not updated")
@@ -66,11 +72,14 @@ def update_episode_router(
 
 
 @router.delete("/{episode_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_episode(episode_id: int = None, db: Session = Depends(get_db)):
+def delete_episode(episode_id: int, db: Session = Depends(get_db)) -> int | None:
     del_episode(db, episode_id)
+    return status.HTTP_204_NO_CONTENT
 
 
 # TODO: episode description/request to get more details on episodes
 @router.get("/{episode_id}/season")
-def get_season_by_episode_router(episode_id: int, db: Session = Depends(get_db)):
+def get_season_by_episode_router(
+    episode_id: int, db: Session = Depends(get_db)
+) -> Episode | None:
     return get_season_by_episode(db, episode_id)
