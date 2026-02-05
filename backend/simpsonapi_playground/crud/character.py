@@ -26,9 +26,7 @@ def suggest_character_by_name(db: Session, query: str) -> Character | None:
     )
 
 
-def get_characters(
-    db: Session, limit: int, offset: int
-) -> Dict[str, Union[List[Character], int]] | None:
+def get_characters(db: Session, limit: int, offset: int):
     base_query = db.query(Character)
     total = base_query.count()
 

@@ -58,9 +58,12 @@ def upd_actor(
 
 
 # TODO: Referential integrity (prevent deleting actors with characters), Safe delete
-@router.delete("/{actor_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{actor_id}", status_code=204)
 def delete_actor(actor_id: int, db: Session = Depends(get_db)) -> None:
-    del_actor(db, actor_id)
+    deleted = del_actor(db, actor_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Actor not found")
+    return None
 
 
 @router.get("/{actor_id}/characters", response_model=PaginatedCharacters)

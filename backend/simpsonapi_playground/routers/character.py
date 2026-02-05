@@ -53,7 +53,7 @@ def read_one_character_router(
     return db_character
 
 
-@router.get("/", response_model=Union[PaginatedCharacters, CharacterResponse])
+@router.get("/", response_model=PaginatedCharacters)
 def read_characters_router(
     name_exact: str | None = None,
     q: str | None = None,
@@ -88,11 +88,13 @@ def change_character_router(
 
 @router.delete(
     "/{char_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=204,
 )
-def delete_character_router(char_id: int, db: Session = Depends(get_db)) -> int:
-    del_character(db, char_id)
-    return http.HTTPStatus.NO_CONTENT
+def delete_character(character_id: int, db: Session = Depends(get_db)) -> None:
+    deleted = delete_character(character_id, db)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return None
 
 
 @router.get("/{character_id}/actors", response_model=list[ActorMini])

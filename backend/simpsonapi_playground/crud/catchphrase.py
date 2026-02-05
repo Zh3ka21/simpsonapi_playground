@@ -26,7 +26,7 @@ def get_catchphrases_for_character(
     character: Character,
     limit: int,
     offset: int,
-) -> Dict[str, Union[List[Catchphrase], int]]:
+):
     if not character:
         raise ValueError(f"Character with ID {character_id} does not exist.")
 

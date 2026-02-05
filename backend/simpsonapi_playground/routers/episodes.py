@@ -71,15 +71,15 @@ def update_episode_router(
     return upd_episode
 
 
-@router.delete("/{episode_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_episode(episode_id: int, db: Session = Depends(get_db)) -> int | None:
-    del_episode(db, episode_id)
-    return status.HTTP_204_NO_CONTENT
+@router.delete("/{episode_id}", status_code=204)
+def delete_episode(episode_id: int, db: Session = Depends(get_db)) -> None:
+    deleted = del_episode(db, episode_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    return None
 
 
 # TODO: episode description/request to get more details on episodes
 @router.get("/{episode_id}/season")
-def get_season_by_episode_router(
-    episode_id: int, db: Session = Depends(get_db)
-) -> Episode | None:
+def get_season_by_episode_router(episode_id: int, db: Session = Depends(get_db)):
     return get_season_by_episode(db, episode_id)

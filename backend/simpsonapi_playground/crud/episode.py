@@ -19,9 +19,7 @@ def get_episode(db: Session, episode_id: int) -> Episode | None:
     return db.query(Episode).filter(Episode.id == episode_id).first()
 
 
-def get_episodes(
-    db: Session, limit: int = 10, offset: int = 0
-) -> Dict[str, Union[List[Episode], int]] | None:
+def get_episodes(db: Session, limit: int = 10, offset: int = 0):
     base_query = db.query(Episode).options(
         selectinload(Episode.season), selectinload(Episode.quotes)
     )
@@ -74,7 +72,7 @@ def get_season_by_episode(db: Session, episode_id: int) -> Episode | None:
 
 def get_episodes_by_season(
     db: Session, season_id: int, limit: int = 10, offset: int = 0
-) -> Dict[str, Union[List[Episode], int]] | None:
+):
     base_query = (
         db.query(Episode)
         .options(selectinload(Episode.season))
