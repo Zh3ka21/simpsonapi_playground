@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from simpsonapi_playground.core.db import Base
 
@@ -16,6 +16,10 @@ class Quote(Base):
     """
 
     __tablename__ = "quotes"
+
+    __table_args__ = (
+        UniqueConstraint("quote", "episode_id", "character_id", name="uq_quote"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     quote = Column(String)
