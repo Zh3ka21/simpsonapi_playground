@@ -9,17 +9,18 @@ repos:
       - id: detect-private-key
       - id: pretty-format-json
         args: [--autofix]
+        exclude: backend/.vscode
   - repo: local
     hooks:
       - id: ruff
         name: ruff
         entry: ruff check
-        args: [--fix, --no-cache, "simpsonapi_playground"]
+        args: [--fix, --no-cache]
         language: system
         types: [python]
       - id: mypy
         name: mypy
-        entry: mypy --install-types --non-interactive simpsonapi_playground
+        entry: mypy --install-types --non-interactive
         pass_filenames: false
         language: system
         types: [python]

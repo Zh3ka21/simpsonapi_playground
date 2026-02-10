@@ -54,7 +54,7 @@ def import_quotes(db: Session, payload: list[QuoteCreate]) -> dict:
         db.commit()
         return {"inserted": len(quotes), "skipped": 0}
 
-    except IntegrityError as e:
+    except IntegrityError:
         db.rollback()
         return {
             "inserted": 0,
