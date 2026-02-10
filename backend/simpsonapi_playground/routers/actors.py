@@ -43,8 +43,11 @@ def read_all_actors(
 
 
 @router.get("/{actor_id}", response_model=ActorSchema)
-def read_an_actor(actor_id: int, db: Session = Depends(get_db)) -> Actor | None:
-    return read_actor(db, actor_id)
+def read_an_actor(actor_id: int, db: Session = Depends(get_db)) -> ActorSchema:
+    actor = read_actor(db, actor_id)
+    if actor is None:
+        raise HTTPException(status_code=404, detail="Actor not found")
+    return actor
 
 
 @router.put("/{actor_id}", response_model=ActorSchema)

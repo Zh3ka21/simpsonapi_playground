@@ -19,6 +19,8 @@ uvicorn = ">=0.38.0,<0.39.0"
 mypy = "^1.19.1"
 ruff = "^0.15.0"
 pre-commit = "^4.5.1"
+pytest = "^9.0.2"
+httpx = "^0.28.1"
 
 [tool.mypy]
 files = "simpsonapi_playground"
