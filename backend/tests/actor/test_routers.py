@@ -1,4 +1,11 @@
+from os import name
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+
+from simpsonapi_playground.crud.actor import create_actor
+from simpsonapi_playground.crud.character import create_character
+from simpsonapi_playground.schemas.actors_schemas import ActorCreate
+from simpsonapi_playground.schemas.characters_schemas import CharacterCreate
 
 
 def test_create_actor_api(client: TestClient) -> None:
@@ -67,3 +74,43 @@ def test_delete_actor_api(client: TestClient) -> None:
 
     res = client.get(f"/actors/{create['id']}")
     assert res.status_code == 404
+
+
+def test_get_characters_played_by_actor(db: Session, client: TestClient) -> None:
+
+    # Create an actor to associate characters with
+    actor_data: ActorCreate = ActorCreate(
+        first_name="Dan",
+        last_name="Castellaneta",
+        cast="Main",
+    )
+
+    actor = create_actor(db, actor_data)
+    assert actor is not None
+
+    # Create multiple actors
+    characters_data = [
+        CharacterCreate(name="Homer Simpson", actor_id=actor.id),
+        CharacterCreate(name="Abe Simpson", actor_id=actor.id),
+        CharacterCreate(name="Krusty the Clown", actor_id=actor.id),
+    ]
+
+    for data in characters_data:
+        char = create_character(db, data)
+        assert char is not None
+
+    response = client.get(
+        f"/actors/{actor.id}/characters",
+        params={"limit": 10, "offset": 0},
+    ).json()
+
+    assert response is not None
+    print(response)
+
+    assert response["total"] == 3
+
+    assert response["items"] is not None
+    assert response["items"][0]["name"] == "Homer Simpson"
+
+    assert response["items"][0]["actor"] is not None
+    assert response["items"][0]["actor"]["first_name"] == "Dan"

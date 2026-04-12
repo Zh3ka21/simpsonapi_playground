@@ -47,7 +47,7 @@ def read_an_actor(actor_id: int, db: Session = Depends(get_db)) -> ActorSchema:
     actor = read_actor(db, actor_id)
     if actor is None:
         raise HTTPException(status_code=404, detail="Actor not found")
-    return actor
+    return ActorSchema.model_validate(actor)
 
 
 @router.put("/{actor_id}", response_model=ActorSchema)
@@ -57,7 +57,7 @@ def upd_actor(
     upd_actor = update_actor(db, actor_id, data)
     if not upd_actor:
         raise HTTPException(status_code=404, detail="Actor was not updated")
-    return upd_actor
+    return ActorSchema.model_validate(upd_actor)
 
 
 # TODO: Referential integrity (prevent deleting actors with characters), Safe delete
