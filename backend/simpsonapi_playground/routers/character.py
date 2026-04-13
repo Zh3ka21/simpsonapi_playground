@@ -87,11 +87,11 @@ def change_character_router(
 
 
 @router.delete(
-    "/{char_id}",
+    "/{character_id}",
     status_code=204,
 )
 def delete_character(character_id: int, db: Session = Depends(get_db)) -> None:
-    deleted = delete_character(character_id, db)
+    deleted = del_character(db, character_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Character not found")
     return None

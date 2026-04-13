@@ -9,6 +9,12 @@ class CharacterBase(BaseModel):
     actor_id: Optional[int] = None
 
 
+class CharacterSchema(CharacterBase):
+    id: int
+
+    model_config = {"from_attributes": True}
+
+
 class CharacterCreate(CharacterBase):
     pass
 

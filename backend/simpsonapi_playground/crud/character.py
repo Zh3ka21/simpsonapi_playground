@@ -62,7 +62,12 @@ def put_character(
 
 
 # TODO: Admin role CRUD operations for Character model
-def del_character(db: Session, character_id: int) -> None:
+def del_character(db: Session, character_id: int) -> bool:
     character = db.query(Character).filter(Character.id == character_id).first()
+
+    if not character:
+        return False
+
     db.delete(character)
     db.commit()
+    return True

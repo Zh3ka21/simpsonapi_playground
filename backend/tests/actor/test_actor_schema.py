@@ -6,7 +6,7 @@ def test_actor_schema_serialization() -> None:
         id=1,
         first_name="Dan",
         last_name="Castellaneta",
-        cast="Homer",
+        cast="Main",
     )
 
     assert schema.first_name == "Dan"
