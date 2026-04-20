@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from simpsonapi_playground.models.actor import Actor
+from simpsonapi_playground.models.character import Character
 
 
 def test_actor_model(db: Session) -> None:

@@ -90,13 +90,13 @@ def test_get_characters_played_by_actor(db: Session, client: TestClient) -> None
 
     # Create multiple actors
     characters_data = [
-        CharacterCreate(name="Homer Simpson", actor_id=actor.id),
-        CharacterCreate(name="Abe Simpson", actor_id=actor.id),
-        CharacterCreate(name="Krusty the Clown", actor_id=actor.id),
+        CharacterCreate(name="Homer Simpson", actor_id=int(actor.id)),
+        CharacterCreate(name="Abe Simpson", actor_id=int(actor.id)),
+        CharacterCreate(name="Krusty the Clown", actor_id=int(actor.id)),
     ]
 
-    for data in characters_data:
-        char = create_character(db, data)
+    for cdata in characters_data:
+        char = create_character(db, cdata)
         assert char is not None
 
     response = client.get(

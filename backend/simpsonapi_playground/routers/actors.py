@@ -54,18 +54,29 @@ def read_an_actor(actor_id: int, db: Session = Depends(get_db)) -> ActorSchema:
 def upd_actor(
     actor_id: int, data: ActorCreate, db: Session = Depends(get_db)
 ) -> Actor | None:
-    upd_actor = update_actor(db, actor_id, data)
-    if not upd_actor:
+    updated_actor = update_actor(db, actor_id, data)
+    if not updated_actor:
         raise HTTPException(status_code=404, detail="Actor was not updated")
-    return ActorSchema.model_validate(upd_actor)
+    return updated_actor
 
 
-# TODO: Referential integrity (prevent deleting actors with characters), Safe delete
 @router.delete("/{actor_id}", status_code=204)
 def delete_actor(actor_id: int, db: Session = Depends(get_db)) -> None:
+    # Check if the actor is associated with any characters
+    actor_with_characters = (
+        db.query(Actor).filter(Actor.id == actor_id, Actor.characters.any()).first()
+    )
+    if actor_with_characters:
+        raise HTTPException(
+            status_code=409,
+            detail="Cannot delete actor, they are associated with characters.",
+        )
+
+    # Proceed with deletion
     deleted = del_actor(db, actor_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Actor not found")
+
     return None
 
 

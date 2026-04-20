@@ -9,7 +9,7 @@ from simpsonapi_playground.schemas.characters_schemas import CharacterCreate
 
 
 def test_create_character_api(client: TestClient) -> None:
-    payload: dict[str, str] = {
+    payload: dict[str, str | int] = {
         "name": "Homer Simpson",
         "actor_id": 1,
     }
@@ -23,7 +23,7 @@ def test_create_character_api(client: TestClient) -> None:
 
 
 def test_get_character_api(client: TestClient) -> None:
-    payload: dict[str, str] = {
+    payload: dict[str, str | int] = {
         "name": "Homer Simpson",
         "actor_id": 1,
     }
