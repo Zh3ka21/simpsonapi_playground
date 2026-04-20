@@ -65,13 +65,18 @@ def read_characters_router(
         character = get_character_by_name(db, name_exact)
         if not character:
             raise HTTPException(status_code=404, detail="Character not found")
-        return character
+        return {
+            "items": [character],
+            "total": 1,
+            "limit": limit,
+            "offset": offset,
+        }
 
     if q:
         suggested_char = suggest_character_by_name(db, q)
         if not suggested_char:
             raise HTTPException(status_code=404, detail="Character not found")
-        return suggested_char
+        return {"items": [suggested_char], "total": 1, "limit": limit, "offset": offset}
 
     return get_characters(db, limit, offset)
 

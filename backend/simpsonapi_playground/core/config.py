@@ -1,19 +1,19 @@
 """Configurational file."""
 
-#import os
+import os
 from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext  # For hashing passwords
+from passlib.context import CryptContext
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv()
 
-# TODO: Change to env
-#DATABASE_URL = os.getenv("DATABASE_URL")
-#SECRET_KEY = os.getenv("SECRET_KEY")
+DATABASE_URL: str = os.getenv("DATABASE_URL") or ""
+SECRET_KEY: str = os.getenv("SECRET_KEY") or ""
 
-DATABASE_URL = "sqlite:///simpsons.sqlite3"
-SECRET_KEY = "eeb88a89682e43c37c7f3fc28afd6036"
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is not set")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
