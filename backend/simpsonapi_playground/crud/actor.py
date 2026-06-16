@@ -82,4 +82,9 @@ def get_characters_based_on_actor(
 
 
 def get_actor_based_on_char(db: Session, character_id: int) -> list[Actor]:
-    return db.query(Actor).filter(Actor.id == character_id).all()
+    return (
+        db.query(Actor)
+        .join(Character, Character.actor_id == Actor.id)
+        .filter(Character.id == character_id)
+        .all()
+    )

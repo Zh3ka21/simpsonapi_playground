@@ -14,14 +14,15 @@ from simpsonapi_playground.schemas.shared_schemas import (
 def get_most_quoted_character(
     db: Session,
 ) -> dict[str, Any] | None:
-    base_query = (
-        db.query(Quote)
+    result = (
+        db.query(Quote.character_id, func.count(Quote.id).label("quote_count"))
         .group_by(Quote.character_id)
         .order_by(func.count(Quote.id).desc())
         .first()
     )
-    if base_query:
-        character_id = base_query.character_id
+
+    if result:
+        character_id = result.character_id
         quote_count = db.query(Quote).filter(Quote.character_id == character_id).count()
         character = db.query(Character).filter(Character.id == character_id).first()
         return {
@@ -33,7 +34,7 @@ def get_most_quoted_character(
 
 def get_most_quoted_episode(db: Session) -> dict[str, Any] | None:
     base_query = (
-        db.query(Quote)
+        db.query(Quote.episode_id, func.count(Quote.id).label("quote_count"))
         .group_by(Quote.episode_id)
         .order_by(func.count(Quote.id).desc())
         .first()

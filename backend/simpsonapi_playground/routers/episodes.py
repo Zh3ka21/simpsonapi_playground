@@ -52,12 +52,21 @@ def get_episodes_router(
     title: str | None = None,
     limit: int = 10,
     offset: int = 0,
-) -> dict[str, Any] | list[Episode] | None:
+) -> PaginatedEpisodes:
+
     if title:
         episode = get_episode_by_name(db, title)
+
         if not episode:
             raise HTTPException(status_code=404, detail="Episode not found")
-        return [episode]
+
+        return PaginatedEpisodes(
+            items=[episode],
+            total=1,
+            limit=1,
+            offset=0,
+        )
+
     return get_episodes(db, limit=limit, offset=offset)
 
 
