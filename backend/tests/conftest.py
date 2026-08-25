@@ -5,7 +5,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from simpsonapi_playground.core.db import Base, get_db
+from simpsonapi_playground.core.db import Base
+from simpsonapi_playground.core.session import get_db
 from simpsonapi_playground.main import app
 
 TEST_DATABASE_URL: str = "sqlite:///./test_simpsons.sqlite3"

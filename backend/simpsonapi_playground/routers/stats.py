@@ -2,7 +2,7 @@ from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from simpsonapi_playground.core.db import get_db
+from simpsonapi_playground.core.session import get_db
 from simpsonapi_playground.crud.stat import (
     get_most_quoted_character,
     get_most_quoted_episode,

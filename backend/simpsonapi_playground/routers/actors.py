@@ -1,7 +1,7 @@
 from typing import Any, Dict, Tuple, Literal
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from simpsonapi_playground.core.db import get_db
+from simpsonapi_playground.core.session import get_db
 from simpsonapi_playground.crud.actor import (
     create_actor,
     del_actor,

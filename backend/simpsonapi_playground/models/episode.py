@@ -1,6 +1,9 @@
+import uuid
+
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from simpsonapi_playground.core.db import Base
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class Episode(Base):
@@ -17,10 +20,29 @@ class Episode(Base):
 
     __tablename__ = "episodes"
 
-    id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
+    )
+
     title = Column(String)
     number = Column(Integer)
-    season_id = Column(Integer, ForeignKey("seasons.id"))
+    # season_id = Column(UUID(as_uuid=True), ForeignKey("seasons.id"))
+    # season = relationship("Season", back_populates="episodes")
+    # quotes = relationship("Quote", back_populates="episode")
 
-    season = relationship("Season", back_populates="episodes")
+    season_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("seasons.id"),
+    )
+
+    season = relationship(
+        "Season",
+        back_populates="episodes",
+        foreign_keys=[season_id],
+    )
+
     quotes = relationship("Quote", back_populates="episode")

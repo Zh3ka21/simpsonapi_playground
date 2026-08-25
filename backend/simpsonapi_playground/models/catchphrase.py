@@ -1,6 +1,9 @@
+import uuid
+
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from simpsonapi_playground.core.db import Base
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class Catchphrase(Base):
@@ -15,8 +18,14 @@ class Catchphrase(Base):
 
     __tablename__ = "catchphrases"
 
-    id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
+    )
     phrase = Column(String)
-    character_id = Column(Integer, ForeignKey("characters.id"))
+    character_id = Column(UUID(as_uuid=True), ForeignKey("characters.id"))
 
     character = relationship("Character", back_populates="catchphrases")

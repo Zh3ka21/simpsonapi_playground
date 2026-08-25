@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Date, Integer
+import uuid
+
+from sqlalchemy import Column, Date, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from simpsonapi_playground.core.db import Base
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class Season(Base):
@@ -21,14 +24,36 @@ class Season(Base):
 
     __tablename__ = "seasons"
 
-    id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
+    )
+
     number = Column(Integer)
     year_start = Column(Integer)
     year_end = Column(Integer)
     season_premiere = Column(Date)
     season_finale = Column(Date)
     average_viewers = Column(Integer)
-    most_watched_episode_id = Column(Integer)
+    # most_watched_episode_id = Column(UUID(as_uuid=True), ForeignKey("episodes.id"))
     most_watched_episode_viewers = Column(Integer)
 
-    episodes = relationship("Episode", back_populates="season")
+    # episodes = relationship("Episode", back_populates="season")
+    most_watched_episode_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("episodes.id"),
+    )
+
+    episodes = relationship(
+        "Episode",
+        back_populates="season",
+        foreign_keys="Episode.season_id",
+    )
+
+    most_watched_episode = relationship(
+        "Episode",
+        foreign_keys=[most_watched_episode_id],
+    )

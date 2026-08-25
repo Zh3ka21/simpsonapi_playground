@@ -1,7 +1,7 @@
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from simpsonapi_playground.core.db import get_db
+from simpsonapi_playground.core.session import get_db
 
 from simpsonapi_playground.models.episode import Episode
 from simpsonapi_playground.schemas.episodes_schemas import (

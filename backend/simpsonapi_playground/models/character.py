@@ -1,6 +1,9 @@
+import uuid
+
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from simpsonapi_playground.core.db import Base
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class Character(Base):
@@ -17,9 +20,16 @@ class Character(Base):
 
     __tablename__ = "characters"
 
-    id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
+    )
+
     name = Column(String)
-    actor_id = Column(Integer, ForeignKey("actors.id"))
+    actor_id = Column(UUID(as_uuid=True), ForeignKey("actors.id"))
 
     actor = relationship("Actor", back_populates="characters")
     catchphrases = relationship("Catchphrase", back_populates="character")

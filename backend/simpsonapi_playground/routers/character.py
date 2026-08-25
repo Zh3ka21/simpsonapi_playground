@@ -3,7 +3,7 @@ import http
 from typing import Any, Dict, Union
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from simpsonapi_playground.core.db import get_db
+from simpsonapi_playground.core.session import get_db
 from simpsonapi_playground.crud.actor import get_actor_based_on_char
 from simpsonapi_playground.crud.quotes import get_character_quotes
 from simpsonapi_playground.models.actor import Actor

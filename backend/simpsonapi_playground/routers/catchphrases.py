@@ -1,7 +1,7 @@
 from typing import Dict, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from simpsonapi_playground.core.db import get_db
+from simpsonapi_playground.core.session import get_db
 
 from simpsonapi_playground.crud.character import get_character
 from simpsonapi_playground.models.catchphrase import Catchphrase

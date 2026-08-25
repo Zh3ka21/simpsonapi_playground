@@ -1,5 +1,6 @@
 # test_db_connection.py
-from simpsonapi_playground.core.db import Base, SessionLocal, engine
+from simpsonapi_playground.core.db import Base
+from simpsonapi_playground.core.session import engine, SessionLocal
 from simpsonapi_playground.models.actor import Actor
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.models.catchphrase import Catchphrase
@@ -22,7 +23,7 @@ session = SessionLocal()
 print("=== Testing Actor query ===")
 actors = session.query(Actor).limit(5).all()
 
-episodes = session.query(Episode).filter(Episode.title.like('%Bart%')).limit(10).all()
+episodes = session.query(Episode).filter(Episode.title.like("%Bart%")).limit(10).all()
 
 for ep in episodes:
     print(ep.title, ep.season_id, ep.season.average_viewers, ep.quotes, ep.number)
