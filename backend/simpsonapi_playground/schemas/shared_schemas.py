@@ -1,8 +1,9 @@
 from pydantic import BaseModel
+from uuid import UUID
 
 
 class ActorMini(BaseModel):
-    id: int
+    id: UUID
     first_name: str
     last_name: str
 
@@ -10,7 +11,7 @@ class ActorMini(BaseModel):
 
 
 class CharacterMini(BaseModel):
-    id: int
+    id: UUID
     name: str
 
     model_config = {"from_attributes": True}
@@ -19,7 +20,7 @@ class CharacterMini(BaseModel):
 class EpisodeMini(BaseModel):
     title: str
     number: int
-    season_id: int
+    season_id: UUID
 
 
 class StatsCharacterMostQuoted(BaseModel):

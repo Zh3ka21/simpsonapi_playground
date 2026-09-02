@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
@@ -10,7 +12,7 @@ class SeasonBase(BaseModel):
     season_premiere: Optional[date] = None
     season_finale: Optional[date] = None
     average_viewers: Optional[int] = None
-    most_watched_episode_id: Optional[int] = None
+    most_watched_episode_id: Optional[UUID] = None
     most_watched_episode_viewers: Optional[int] = None
 
 

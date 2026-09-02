@@ -1,9 +1,18 @@
 import http
-from typing import Dict, List, Union
+from typing import TypedDict, List
 from sqlalchemy import func
 from sqlalchemy.orm import Session, selectinload
+from uuid import UUID
+
 from simpsonapi_playground.models.episode import Episode
 from simpsonapi_playground.schemas.episodes_schemas import EpisodeCreate
+
+
+class PaginatedEpisodesData(TypedDict):
+    items: list[Episode]
+    total: int
+    limit: int
+    offset: int
 
 
 # TODO: Admin role CRUD operations for Character model
@@ -15,11 +24,13 @@ def create_episode(db: Session, data: EpisodeCreate) -> Episode | None:
     return new
 
 
-def get_episode(db: Session, episode_id: int) -> Episode | None:
+def get_episode(db: Session, episode_id: UUID) -> Episode | None:
     return db.query(Episode).filter(Episode.id == episode_id).first()
 
 
-def get_episodes(db: Session, limit: int = 10, offset: int = 0):
+def get_episodes(
+    db: Session, limit: int = 10, offset: int = 0
+) -> PaginatedEpisodesData:
     base_query = db.query(Episode).options(
         selectinload(Episode.season), selectinload(Episode.quotes)
     )
@@ -39,7 +50,7 @@ def get_episode_by_name(db: Session, episode_title: str = "") -> Episode | None:
 
 
 # TODO: Admin role CRUD operations for Character model
-def put_episode(db: Session, episode_id: int, data: EpisodeCreate) -> Episode | None:
+def put_episode(db: Session, episode_id: UUID, data: EpisodeCreate) -> Episode | None:
     episode = db.query(Episode).filter(Episode.id == episode_id).first()
     if episode:
         for key, value in data.model_dump().items():
@@ -50,7 +61,7 @@ def put_episode(db: Session, episode_id: int, data: EpisodeCreate) -> Episode | 
 
 
 # TODO: Admin role CRUD operations for Character model
-def del_episode(db: Session, episode_id: int) -> http.HTTPStatus:
+def del_episode(db: Session, episode_id: UUID) -> http.HTTPStatus:
     episode = db.query(Episode).filter(Episode.id == episode_id).first()
     db.delete(episode)
     db.commit()
@@ -61,7 +72,7 @@ def select_random_episode(db: Session) -> Episode | None:
     return db.query(Episode).order_by(func.random()).first()
 
 
-def get_season_by_episode(db: Session, episode_id: int) -> Episode | None:
+def get_season_by_episode(db: Session, episode_id: UUID) -> Episode | None:
     return (
         db.query(Episode)
         .options(selectinload(Episode.season))
@@ -71,8 +82,8 @@ def get_season_by_episode(db: Session, episode_id: int) -> Episode | None:
 
 
 def get_episodes_by_season(
-    db: Session, season_id: int, limit: int = 10, offset: int = 0
-):
+    db: Session, season_id: UUID, limit: int = 10, offset: int = 0
+) -> PaginatedEpisodesData:
     base_query = (
         db.query(Episode)
         .options(selectinload(Episode.season))

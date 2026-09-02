@@ -1,6 +1,8 @@
 from typing import Any, Dict, Tuple, Literal
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from uuid import UUID
+
 from simpsonapi_playground.core.session import get_db
 from simpsonapi_playground.crud.actor import (
     create_actor,
@@ -43,7 +45,7 @@ def read_all_actors(
 
 
 @router.get("/{actor_id}", response_model=ActorSchema)
-def read_an_actor(actor_id: int, db: Session = Depends(get_db)) -> ActorSchema:
+def read_an_actor(actor_id: UUID, db: Session = Depends(get_db)) -> ActorSchema:
     actor = read_actor(db, actor_id)
     if actor is None:
         raise HTTPException(status_code=404, detail="Actor not found")
@@ -52,7 +54,7 @@ def read_an_actor(actor_id: int, db: Session = Depends(get_db)) -> ActorSchema:
 
 @router.put("/{actor_id}", response_model=ActorSchema)
 def upd_actor(
-    actor_id: int, data: ActorCreate, db: Session = Depends(get_db)
+    actor_id: UUID, data: ActorCreate, db: Session = Depends(get_db)
 ) -> Actor | None:
     updated_actor = update_actor(db, actor_id, data)
     if not updated_actor:
@@ -61,7 +63,7 @@ def upd_actor(
 
 
 @router.delete("/{actor_id}", status_code=204)
-def delete_actor(actor_id: int, db: Session = Depends(get_db)) -> None:
+def delete_actor(actor_id: UUID, db: Session = Depends(get_db)) -> None:
     # Check if the actor is associated with any characters
     actor_with_characters = (
         db.query(Actor).filter(Actor.id == actor_id, Actor.characters.any()).first()
@@ -82,8 +84,8 @@ def delete_actor(actor_id: int, db: Session = Depends(get_db)) -> None:
 
 @router.get("/{actor_id}/characters", response_model=PaginatedCharacters)
 def get_characters_played_by_actor(
+    actor_id: UUID,
     db: Session = Depends(get_db),
-    actor_id: int = 0,
     limit: int = Query(10, ge=1, le=20),
     offset: int = Query(0, ge=0),
 ) -> Dict[str, Any]:

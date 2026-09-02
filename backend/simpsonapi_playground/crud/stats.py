@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Union
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from uuid import UUID
 
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.models.episode import Episode

@@ -16,15 +16,32 @@ branch_labels = None
 depends_on = None
 
 
+def _drop_primary_key(table_name: str) -> None:
+    """Drop the existing primary key without depending on pgloader's name."""
+    op.execute(f"""
+        DO $$
+        DECLARE
+            constraint_name text;
+        BEGIN
+            SELECT conname
+            INTO constraint_name
+            FROM pg_constraint
+            WHERE conrelid = '{table_name}'::regclass
+              AND contype = 'p';
+
+            IF constraint_name IS NOT NULL THEN
+                EXECUTE format(
+                    'ALTER TABLE {table_name} DROP CONSTRAINT %I',
+                    constraint_name
+                );
+            END IF;
+        END $$;
+        """)
+
+
 def upgrade() -> None:
     # ================================================================
-    # 1. Generate UUIDs for every existing row.
-    #
-    # We temporarily store the mapping:
-    #
-    #     old BIGINT id -> new UUID
-    #
-    # so that foreign keys can be converted safely.
+    # 1. Generate UUID mappings
     # ================================================================
 
     op.execute("""
@@ -33,54 +50,42 @@ def upgrade() -> None:
 
     op.execute("""
         CREATE TEMP TABLE id_mapping_actors AS
-        SELECT
-            id AS old_id,
-            gen_random_uuid() AS new_id
+        SELECT id AS old_id, gen_random_uuid() AS new_id
         FROM actors
     """)
 
     op.execute("""
         CREATE TEMP TABLE id_mapping_characters AS
-        SELECT
-            id AS old_id,
-            gen_random_uuid() AS new_id
+        SELECT id AS old_id, gen_random_uuid() AS new_id
         FROM characters
     """)
 
     op.execute("""
         CREATE TEMP TABLE id_mapping_catchphrases AS
-        SELECT
-            id AS old_id,
-            gen_random_uuid() AS new_id
+        SELECT id AS old_id, gen_random_uuid() AS new_id
         FROM catchphrases
     """)
 
     op.execute("""
         CREATE TEMP TABLE id_mapping_episodes AS
-        SELECT
-            id AS old_id,
-            gen_random_uuid() AS new_id
+        SELECT id AS old_id, gen_random_uuid() AS new_id
         FROM episodes
     """)
 
     op.execute("""
         CREATE TEMP TABLE id_mapping_quotes AS
-        SELECT
-            id AS old_id,
-            gen_random_uuid() AS new_id
+        SELECT id AS old_id, gen_random_uuid() AS new_id
         FROM quotes
     """)
 
     op.execute("""
         CREATE TEMP TABLE id_mapping_seasons AS
-        SELECT
-            id AS old_id,
-            gen_random_uuid() AS new_id
+        SELECT id AS old_id, gen_random_uuid() AS new_id
         FROM seasons
     """)
 
     # ================================================================
-    # 2. Add temporary UUID columns.
+    # 2. Add temporary UUID columns
     # ================================================================
 
     op.execute("""
@@ -120,7 +125,7 @@ def upgrade() -> None:
     """)
 
     # ================================================================
-    # 3. Populate new UUID columns.
+    # 3. Populate UUID columns
     # ================================================================
 
     op.execute("""
@@ -166,10 +171,8 @@ def upgrade() -> None:
     """)
 
     # ================================================================
-    # 4. Convert foreign-key values.
+    # 4. Convert foreign-key values
     # ================================================================
-
-    # characters.actor_id -> actors.id
 
     op.execute("""
         UPDATE characters c
@@ -178,16 +181,12 @@ def upgrade() -> None:
         WHERE c.actor_id = m.old_id
     """)
 
-    # catchphrases.character_id -> characters.id
-
     op.execute("""
         UPDATE catchphrases cp
         SET new_character_id = m.new_id
         FROM id_mapping_characters m
         WHERE cp.character_id = m.old_id
     """)
-
-    # episodes.season_id -> seasons.id
 
     op.execute("""
         UPDATE episodes e
@@ -196,8 +195,6 @@ def upgrade() -> None:
         WHERE e.season_id = m.old_id
     """)
 
-    # quotes.character_id -> characters.id
-
     op.execute("""
         UPDATE quotes q
         SET new_character_id = m.new_id
@@ -205,16 +202,12 @@ def upgrade() -> None:
         WHERE q.character_id = m.old_id
     """)
 
-    # quotes.episode_id -> episodes.id
-
     op.execute("""
         UPDATE quotes q
         SET new_episode_id = m.new_id
         FROM id_mapping_episodes m
         WHERE q.episode_id = m.old_id
     """)
-
-    # seasons.most_watched_episode_id -> episodes.id
 
     op.execute("""
         UPDATE seasons s
@@ -224,65 +217,95 @@ def upgrade() -> None:
     """)
 
     # ================================================================
-    # 5. Remove old indexes.
+    # 5. Remove indexes on foreign keys
+    #
+    # pgloader generates different index names, so find them by
+    # column rather than assuming a specific name.
     # ================================================================
 
     op.execute("""
-        DROP INDEX IF EXISTS idx_16555_index_catchphrases_on_character_id
+        DO $$
+        DECLARE
+            index_name text;
+        BEGIN
+            FOR index_name IN
+                SELECT indexrelname
+                FROM pg_stat_user_indexes
+                WHERE relname = 'characters'
+                  AND indexrelname LIKE '%actor_id%'
+            LOOP
+                EXECUTE format('DROP INDEX IF EXISTS %I', index_name);
+            END LOOP;
+        END $$;
     """)
 
     op.execute("""
-        DROP INDEX IF EXISTS idx_16562_index_characters_on_actor_id
+        DO $$
+        DECLARE
+            index_name text;
+        BEGIN
+            FOR index_name IN
+                SELECT indexrelname
+                FROM pg_stat_user_indexes
+                WHERE relname = 'catchphrases'
+                  AND indexrelname LIKE '%character_id%'
+            LOOP
+                EXECUTE format('DROP INDEX IF EXISTS %I', index_name);
+            END LOOP;
+        END $$;
     """)
 
     op.execute("""
-        DROP INDEX IF EXISTS idx_16569_index_episodes_on_season_id
+        DO $$
+        DECLARE
+            index_name text;
+        BEGIN
+            FOR index_name IN
+                SELECT indexrelname
+                FROM pg_stat_user_indexes
+                WHERE relname = 'episodes'
+                  AND indexrelname LIKE '%season_id%'
+            LOOP
+                EXECUTE format('DROP INDEX IF EXISTS %I', index_name);
+            END LOOP;
+        END $$;
     """)
 
     op.execute("""
-        DROP INDEX IF EXISTS idx_16576_index_quotes_on_character_id
-    """)
-
-    op.execute("""
-        DROP INDEX IF EXISTS idx_16576_index_quotes_on_episode_id
+        DO $$
+        DECLARE
+            index_name text;
+        BEGIN
+            FOR index_name IN
+                SELECT indexrelname
+                FROM pg_stat_user_indexes
+                WHERE relname = 'quotes'
+                  AND (
+                      indexrelname LIKE '%character_id%'
+                      OR indexrelname LIKE '%episode_id%'
+                  )
+            LOOP
+                EXECUTE format('DROP INDEX IF EXISTS %I', index_name);
+            END LOOP;
+        END $$;
     """)
 
     # ================================================================
-    # 6. Remove old primary keys.
+    # 6. Remove primary keys
+    #
+    # IMPORTANT:
+    # We do not assume pgloader's constraint names.
     # ================================================================
 
-    op.execute("""
-        ALTER TABLE actors
-        DROP CONSTRAINT idx_16548_actors_pkey
-    """)
-
-    op.execute("""
-        ALTER TABLE characters
-        DROP CONSTRAINT idx_16562_characters_pkey
-    """)
-
-    op.execute("""
-        ALTER TABLE catchphrases
-        DROP CONSTRAINT idx_16555_catchphrases_pkey
-    """)
-
-    op.execute("""
-        ALTER TABLE episodes
-        DROP CONSTRAINT idx_16569_episodes_pkey
-    """)
-
-    op.execute("""
-        ALTER TABLE quotes
-        DROP CONSTRAINT idx_16576_quotes_pkey
-    """)
-
-    op.execute("""
-        ALTER TABLE seasons
-        DROP CONSTRAINT idx_16583_seasons_pkey
-    """)
+    _drop_primary_key("actors")
+    _drop_primary_key("characters")
+    _drop_primary_key("catchphrases")
+    _drop_primary_key("episodes")
+    _drop_primary_key("quotes")
+    _drop_primary_key("seasons")
 
     # ================================================================
-    # 7. Drop old ID / FK columns.
+    # 7. Drop old ID/FK columns
     # ================================================================
 
     op.execute("""
@@ -322,7 +345,7 @@ def upgrade() -> None:
     """)
 
     # ================================================================
-    # 8. Rename temporary UUID columns.
+    # 8. Rename UUID columns
     # ================================================================
 
     op.execute("""
@@ -387,16 +410,16 @@ def upgrade() -> None:
     """)
 
     # ================================================================
-    # 9. Remove quotes.date.
+    # 9. Remove quotes.date
     # ================================================================
 
     op.execute("""
         ALTER TABLE quotes
-        DROP COLUMN date
+        DROP COLUMN IF EXISTS date
     """)
 
     # ================================================================
-    # 10. Add primary keys.
+    # 10. Add primary keys
     # ================================================================
 
     op.execute("""
@@ -430,7 +453,7 @@ def upgrade() -> None:
     """)
 
     # ================================================================
-    # 11. Add foreign keys.
+    # 11. Add foreign keys
     # ================================================================
 
     op.create_foreign_key(
@@ -482,7 +505,7 @@ def upgrade() -> None:
     )
 
     # ================================================================
-    # 12. Indexes.
+    # 12. Add indexes
     # ================================================================
 
     op.create_index("ix_actors_id", "actors", ["id"])
@@ -523,7 +546,7 @@ def upgrade() -> None:
     )
 
     # ================================================================
-    # 13. Quote uniqueness.
+    # 13. Quote uniqueness
     # ================================================================
 
     op.create_unique_constraint(

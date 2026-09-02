@@ -1,0 +1,10 @@
+LOAD DATABASE
+    FROM sqlite:///data/simpsons.sqlite3
+    INTO postgresql://admin@postgres:5432/simpsons_db
+
+WITH
+    include drop,
+    create tables,
+    create indexes,
+    reset sequences;
+

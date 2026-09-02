@@ -3,6 +3,8 @@ import http
 from typing import Any, Dict, Union
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from uuid import UUID
+
 from simpsonapi_playground.core.session import get_db
 from simpsonapi_playground.crud.actor import get_actor_based_on_char
 from simpsonapi_playground.crud.quotes import get_character_quotes
@@ -45,7 +47,7 @@ def create_character_router(
 
 @router.get("/{character_id}", response_model=CharacterResponse)
 def read_one_character_router(
-    character_id: int, db: Session = Depends(get_db)
+    character_id: UUID, db: Session = Depends(get_db)
 ) -> Character | None:
     db_character = get_character(db, character_id)
     if not db_character:
@@ -83,7 +85,7 @@ def read_characters_router(
 
 @router.put("/{char_id}", response_model=CharacterResponse)
 def change_character_router(
-    char_id: int, data: CharacterCreate, db: Session = Depends(get_db)
+    char_id: UUID, data: CharacterCreate, db: Session = Depends(get_db)
 ) -> Character | None:
     upd_char = put_character(db, char_id, data)
     if not upd_char:
@@ -95,7 +97,7 @@ def change_character_router(
     "/{character_id}",
     status_code=204,
 )
-def delete_character(character_id: int, db: Session = Depends(get_db)) -> None:
+def delete_character(character_id: UUID, db: Session = Depends(get_db)) -> None:
     deleted = del_character(db, character_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Character not found")
@@ -104,7 +106,7 @@ def delete_character(character_id: int, db: Session = Depends(get_db)) -> None:
 
 @router.get("/{character_id}/actors", response_model=list[ActorMini])
 def get_actor_for_character(
-    character_id: int,
+    character_id: UUID,
     db: Session = Depends(get_db),
 ) -> list[Actor] | None:
     return get_actor_based_on_char(db, character_id)
@@ -112,7 +114,7 @@ def get_actor_for_character(
 
 @router.get("/{character_id}/quotes", response_model=PaginatedQuotesResponse)
 def get_characters_quotes_router(
-    character_id: int,
+    character_id: UUID,
     db: Session = Depends(get_db),
     limit: int = Query(10, ge=1, le=20),
     offset: int = Query(0, ge=0),

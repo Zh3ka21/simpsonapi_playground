@@ -1,5 +1,7 @@
 from typing import Dict, List, Union
 from sqlalchemy.orm import Session, selectinload
+from uuid import UUID
+
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.schemas.characters_schemas import CharacterCreate
 
@@ -13,7 +15,7 @@ def create_character(db: Session, data: CharacterCreate) -> Character:
     return new
 
 
-def get_character(db: Session, character_id: int) -> Character | None:
+def get_character(db: Session, character_id: UUID) -> Character | None:
     return db.query(Character).filter(Character.id == character_id).first()
 
 
@@ -26,7 +28,9 @@ def suggest_character_by_name(db: Session, query: str) -> Character | None:
     )
 
 
-def get_characters(db: Session, limit: int, offset: int):
+def get_characters(
+    db: Session, limit: int, offset: int
+) -> Dict[str, List[Character] | int]:
     base_query = db.query(Character)
     total = base_query.count()
 
@@ -50,7 +54,7 @@ def get_character_by_name(db: Session, char_name: str = "") -> Character | None:
 
 # TODO: Admin role CRUD operations for Character model
 def put_character(
-    db: Session, character_id: int, data: CharacterCreate
+    db: Session, character_id: UUID, data: CharacterCreate
 ) -> Character | None:
     character = db.query(Character).filter(Character.id == character_id).first()
     if character:
@@ -62,7 +66,7 @@ def put_character(
 
 
 # TODO: Admin role CRUD operations for Character model
-def del_character(db: Session, character_id: int) -> bool:
+def del_character(db: Session, character_id: UUID) -> bool:
     character = db.query(Character).filter(Character.id == character_id).first()
 
     if not character:

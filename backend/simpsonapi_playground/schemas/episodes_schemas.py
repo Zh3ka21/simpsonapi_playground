@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from uuid import UUID
 
 from simpsonapi_playground.schemas.seasons_schemas import SeasonBase
 from simpsonapi_playground.schemas.quotes_schemas import QuoteBase
@@ -8,7 +9,7 @@ from simpsonapi_playground.schemas.quotes_schemas import QuoteBase
 class EpisodeBase(BaseModel):
     title: Optional[str] = None
     number: Optional[int] = None
-    season_id: Optional[int] = None
+    season_id: Optional[UUID] = None
 
 
 class EpisodeCreate(EpisodeBase):
@@ -16,7 +17,7 @@ class EpisodeCreate(EpisodeBase):
 
 
 class EpisodeSchema(EpisodeBase):
-    id: int
+    id: UUID
 
     model_config = {"from_attributes": True}
 
@@ -29,7 +30,7 @@ class PaginatedEpisodes(BaseModel):
 
 
 class EpisodeResponse(EpisodeBase):
-    id: int
+    id: UUID
     season: Optional[SeasonBase] = None
     quotes: List[QuoteBase] = []
 

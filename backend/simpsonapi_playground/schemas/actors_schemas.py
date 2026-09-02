@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from uuid import UUID
 
 
 class ActorBase(BaseModel):
@@ -13,7 +14,7 @@ class ActorCreate(ActorBase):
 
 
 class ActorSchema(ActorBase):
-    id: int
+    id: UUID
 
     model_config = {"from_attributes": True}
 

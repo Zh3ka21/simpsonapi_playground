@@ -1,6 +1,7 @@
 from typing import Any, Literal, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import ColumnElement, asc, desc
+from uuid import UUID
 
 from simpsonapi_playground.models.actor import Actor
 from simpsonapi_playground.models.character import Character
@@ -42,11 +43,11 @@ def read_actors(
     return (base_query.offset(offset).limit(limit).all(), total)
 
 
-def read_actor(db: Session, actor_id: int) -> Actor | None:
+def read_actor(db: Session, actor_id: UUID) -> Actor | None:
     return db.query(Actor).filter(Actor.id == actor_id).first()
 
 
-def update_actor(db: Session, actor_id: int, data: ActorCreate) -> Actor | None:
+def update_actor(db: Session, actor_id: UUID, data: ActorCreate) -> Actor | None:
     actor = db.query(Actor).filter(Actor.id == actor_id).first()
 
     if actor:
@@ -58,7 +59,7 @@ def update_actor(db: Session, actor_id: int, data: ActorCreate) -> Actor | None:
 
 
 # TODO: Admin role CRUD operations for Actor model
-def del_actor(db: Session, actor_id: int) -> Actor | None:
+def del_actor(db: Session, actor_id: UUID) -> Actor | None:
     actor = db.query(Actor).filter(Actor.id == actor_id).first()
     if actor:
         db.delete(actor)
@@ -68,7 +69,7 @@ def del_actor(db: Session, actor_id: int) -> Actor | None:
 
 def get_characters_based_on_actor(
     db: Session,
-    actor_id: int,
+    actor_id: UUID,
     limit: int,
     offset: int,
 ) -> Tuple[list[Character], int]:
@@ -81,7 +82,7 @@ def get_characters_based_on_actor(
     return items, total
 
 
-def get_actor_based_on_char(db: Session, character_id: int) -> list[Actor]:
+def get_actor_based_on_char(db: Session, character_id: UUID) -> list[Actor]:
     return (
         db.query(Actor)
         .join(Character, Character.actor_id == Actor.id)

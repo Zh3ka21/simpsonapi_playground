@@ -2,6 +2,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.session import get_db
+from uuid import UUID
 
 from simpsonapi_playground.models.episode import Episode
 from simpsonapi_playground.schemas.episodes_schemas import (
@@ -38,7 +39,7 @@ def get_random_episode_router(db: Session = Depends(get_db)) -> Episode | None:
 
 @router.get("/{episode_id}", response_model=EpisodeResponse)
 def get_episode_router(
-    episode_id: int, db: Session = Depends(get_db)
+    episode_id: UUID, db: Session = Depends(get_db)
 ) -> Episode | None:
     db_episode = get_episode(db, episode_id)
     if not db_episode:
@@ -61,18 +62,23 @@ def get_episodes_router(
             raise HTTPException(status_code=404, detail="Episode not found")
 
         return PaginatedEpisodes(
-            items=[episode],
+            items=[EpisodeSchema.model_validate(episode)],
             total=1,
             limit=1,
             offset=0,
         )
-
-    return get_episodes(db, limit=limit, offset=offset)
+    episodes = get_episodes(db, limit=limit, offset=offset)
+    return PaginatedEpisodes(
+        items=[EpisodeSchema.model_validate(episode) for episode in episodes["items"]],
+        total=episodes["total"],
+        limit=episodes["limit"],
+        offset=episodes["offset"],
+    )
 
 
 @router.put("/{episode_id}", response_model=EpisodeResponse)
 def update_episode_router(
-    episode_id: int, data: EpisodeCreate, db: Session = Depends(get_db)
+    episode_id: UUID, data: EpisodeCreate, db: Session = Depends(get_db)
 ) -> Episode | None:
     upd_episode = put_episode(db, episode_id, data)
     if not upd_episode:
@@ -81,7 +87,7 @@ def update_episode_router(
 
 
 @router.delete("/{episode_id}", status_code=204)
-def delete_episode(episode_id: int, db: Session = Depends(get_db)) -> None:
+def delete_episode(episode_id: UUID, db: Session = Depends(get_db)) -> None:
     deleted = del_episode(db, episode_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Episode not found")
@@ -89,6 +95,8 @@ def delete_episode(episode_id: int, db: Session = Depends(get_db)) -> None:
 
 
 # TODO: episode description/request to get more details on episodes
-@router.get("/{episode_id}/season")
-def get_season_by_episode_router(episode_id: int, db: Session = Depends(get_db)):
+@router.get("/{episode_id}/season", response_model=EpisodeResponse)
+def get_season_by_episode_router(
+    episode_id: UUID, db: Session = Depends(get_db)
+) -> Episode | None:
     return get_season_by_episode(db, episode_id)

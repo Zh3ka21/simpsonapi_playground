@@ -3,6 +3,7 @@ from typing import Any, Dict
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from simpsonapi_playground.models.quote import Quote
 from simpsonapi_playground.schemas.quotes_schemas import (
@@ -13,7 +14,7 @@ from simpsonapi_playground.utils.batching_utilities import chunked
 
 
 def get_quotes_for_episode(
-    db: Session, episode_id: int, limit: int, offset: int
+    db: Session, episode_id: UUID, limit: int, offset: int
 ) -> dict[str, Any]:
     base_query = db.query(Quote).filter(Quote.episode_id == episode_id)
     total = base_query.count()
@@ -28,7 +29,7 @@ def get_quotes_for_episode(
 
 
 def get_character_quotes(
-    db: Session, character_id: int, limit: int, offset: int
+    db: Session, character_id: UUID, limit: int, offset: int
 ) -> Dict[str, Any]:
     base_query = db.query(Quote).filter(Quote.character_id == character_id)
     total = base_query.count()
@@ -46,7 +47,7 @@ def get_random_quote(db: Session) -> Quote | None:
     return db.query(Quote).order_by(func.random()).first()
 
 
-def import_quotes(db: Session, payload: list[QuoteCreate]) -> dict:
+def import_quotes(db: Session, payload: list[QuoteCreate]) -> dict[str, int | str]:
     quotes = [Quote(**q.model_dump()) for q in payload]
 
     try:

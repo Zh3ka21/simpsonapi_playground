@@ -1,16 +1,17 @@
 from pydantic import BaseModel
 from typing import Optional
+from uuid import UUID
 
 from simpsonapi_playground.schemas.shared_schemas import ActorMini
 
 
 class CharacterBase(BaseModel):
     name: Optional[str] = None
-    actor_id: Optional[int] = None
+    actor_id: Optional[UUID] = None
 
 
 class CharacterSchema(CharacterBase):
-    id: int
+    id: UUID
 
     model_config = {"from_attributes": True}
 
@@ -20,7 +21,7 @@ class CharacterCreate(CharacterBase):
 
 
 class CharacterResponse(BaseModel):
-    id: int
+    id: UUID
     name: str
 
     actor: ActorMini | None = None

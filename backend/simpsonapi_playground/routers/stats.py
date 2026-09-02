@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from simpsonapi_playground.core.session import get_db
-from simpsonapi_playground.crud.stat import (
+from simpsonapi_playground.crud.stats import (
     get_most_quoted_character,
     get_most_quoted_episode,
 )
@@ -11,7 +11,6 @@ from simpsonapi_playground.schemas.shared_schemas import (
     StatsCharacterMostQuoted,
     StatsEpisodeMostQuoted,
 )
-
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 
