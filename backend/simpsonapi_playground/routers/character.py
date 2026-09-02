@@ -13,6 +13,7 @@ from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.schemas.characters_schemas import (
     CharacterCreate,
     CharacterResponse,
+    CharacterSchema,
     PaginatedCharacters,
 )
 from simpsonapi_playground.crud.character import (
@@ -62,25 +63,42 @@ def read_characters_router(
     db: Session = Depends(get_db),
     limit: int = Query(10, ge=1, le=20),
     offset: int = Query(0, ge=0),
-) -> dict[str, list[Character] | int] | Character | None:
+) -> PaginatedCharacters:
     if name_exact:
         character = get_character_by_name(db, name_exact)
         if not character:
             raise HTTPException(status_code=404, detail="Character not found")
-        return {
-            "items": [character],
-            "total": 1,
-            "limit": limit,
-            "offset": offset,
-        }
+
+        return PaginatedCharacters(
+            items=[CharacterResponse.model_validate(character)],
+            total=1,
+            limit=limit,
+            offset=offset,
+        )
 
     if q:
         suggested_char = suggest_character_by_name(db, q)
         if not suggested_char:
             raise HTTPException(status_code=404, detail="Character not found")
-        return {"items": [suggested_char], "total": 1, "limit": limit, "offset": offset}
 
-    return get_characters(db, limit, offset)
+        return PaginatedCharacters(
+            items=[CharacterResponse.model_validate(suggested_char)],
+            total=1,
+            limit=limit,
+            offset=offset,
+        )
+
+    characters = get_characters(db, limit, offset)
+
+    return PaginatedCharacters(
+        items=[
+            CharacterResponse.model_validate(character)
+            for character in characters["items"]
+        ],
+        total=characters["total"],
+        limit=characters["limit"],
+        offset=characters["offset"],
+    )
 
 
 @router.put("/{char_id}", response_model=CharacterResponse)

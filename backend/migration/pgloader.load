@@ -7,4 +7,3 @@ WITH
     create tables,
     create indexes,
     reset sequences;
-

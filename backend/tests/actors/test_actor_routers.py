@@ -1,4 +1,7 @@
+from typing import cast
+from uuid import UUID
 from os import name
+
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
@@ -90,9 +93,9 @@ def test_get_characters_played_by_actor(db: Session, client: TestClient) -> None
 
     # Create multiple actors
     characters_data = [
-        CharacterCreate(name="Homer Simpson", actor_id=int(actor.id)),
-        CharacterCreate(name="Abe Simpson", actor_id=int(actor.id)),
-        CharacterCreate(name="Krusty the Clown", actor_id=int(actor.id)),
+        CharacterCreate(name="Homer Simpson", actor_id=cast(UUID, actor.id)),
+        CharacterCreate(name="Abe Simpson", actor_id=cast(UUID, actor.id)),
+        CharacterCreate(name="Krusty the Clown", actor_id=cast(UUID, actor.id)),
     ]
 
     for cdata in characters_data:

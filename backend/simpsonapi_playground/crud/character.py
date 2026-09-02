@@ -1,9 +1,17 @@
 from typing import Dict, List, Union
 from sqlalchemy.orm import Session, selectinload
 from uuid import UUID
+from typing import TypedDict
 
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.schemas.characters_schemas import CharacterCreate
+
+
+class PaginatedCharactersData(TypedDict):
+    items: list[Character]
+    total: int
+    limit: int
+    offset: int
 
 
 # TODO: Admin role CRUD operations for Character model
@@ -28,9 +36,7 @@ def suggest_character_by_name(db: Session, query: str) -> Character | None:
     )
 
 
-def get_characters(
-    db: Session, limit: int, offset: int
-) -> Dict[str, List[Character] | int]:
+def get_characters(db: Session, limit: int, offset: int) -> PaginatedCharactersData:
     base_query = db.query(Character)
     total = base_query.count()
 

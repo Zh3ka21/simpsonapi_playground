@@ -1,4 +1,5 @@
 from typing import cast
+from uuid import UUID
 from sqlalchemy.orm import Session
 
 from simpsonapi_playground.crud.actor import (
@@ -36,7 +37,7 @@ def test_read_actor(db: Session) -> None:
     actor = create_actor(db, actor_data)
     assert actor is not None
 
-    fetched = read_actor(db, cast(int, actor.id))
+    fetched = read_actor(db, cast(UUID, actor.id))
     assert fetched is not None
     assert fetched.id == actor.id
     assert fetched.first_name == "Julie"
@@ -79,7 +80,7 @@ def test_update_actor(db: Session) -> None:
         cast="Main",
     )
 
-    updated = update_actor(db, cast(int, actor.id), updated_data)
+    updated = update_actor(db, cast(UUID, actor.id), updated_data)
     assert updated is not None
     assert updated.cast == "Main"
 
@@ -93,9 +94,9 @@ def test_delete_actor(db: Session) -> None:
     actor = create_actor(db, actor_data)
     assert actor is not None
 
-    deleted = del_actor(db, cast(int, actor.id))
+    deleted = del_actor(db, cast(UUID, actor.id))
     assert deleted is not None
     assert deleted.id == actor.id
 
-    should_be_none = read_actor(db, cast(int, actor.id))
+    should_be_none = read_actor(db, cast(UUID, actor.id))
     assert should_be_none is None
