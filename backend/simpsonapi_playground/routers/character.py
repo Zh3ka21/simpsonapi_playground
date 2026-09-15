@@ -1,6 +1,4 @@
-from http import HTTPStatus
-import http
-from typing import Any, Dict, Union
+from typing import Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -10,10 +8,10 @@ from simpsonapi_playground.crud.actor import get_actor_based_on_char
 from simpsonapi_playground.crud.quotes import get_character_quotes
 from simpsonapi_playground.models.actor import Actor
 from simpsonapi_playground.models.character import Character
+from simpsonapi_playground.models.quote import Quote
 from simpsonapi_playground.schemas.characters_schemas import (
     CharacterCreate,
     CharacterResponse,
-    CharacterSchema,
     PaginatedCharacters,
 )
 from simpsonapi_playground.crud.character import (
@@ -136,5 +134,5 @@ def get_characters_quotes_router(
     db: Session = Depends(get_db),
     limit: int = Query(10, ge=1, le=20),
     offset: int = Query(0, ge=0),
-) -> Dict[str, Any] | None:
+) -> Dict[str, List[Quote] | int] | None:
     return get_character_quotes(db, character_id, limit=limit, offset=offset)

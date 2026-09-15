@@ -1,4 +1,3 @@
-from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from simpsonapi_playground.core.session import get_db
@@ -25,7 +24,7 @@ from simpsonapi_playground.crud.episode import (
 router = APIRouter(prefix="/episodes", tags=["episodes"])
 
 
-@router.post("/", response_model=EpisodeSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=EpisodeSchema)
 def create_episode_router(
     episode: EpisodeCreate, db: Session = Depends(get_db)
 ) -> Episode | None:

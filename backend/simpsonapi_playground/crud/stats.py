@@ -1,20 +1,14 @@
-from typing import Any, Dict, List, Union
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from uuid import UUID
 
 from simpsonapi_playground.models.character import Character
 from simpsonapi_playground.models.episode import Episode
 from simpsonapi_playground.models.quote import Quote
-from simpsonapi_playground.schemas.shared_schemas import (
-    StatsCharacterMostQuoted,
-    StatsEpisodeMostQuoted,
-)
 
 
 def get_most_quoted_character(
     db: Session,
-) -> dict[str, Any] | None:
+) -> dict[str, Character | int | None] | None:
     result = (
         db.query(Quote.character_id, func.count(Quote.id).label("quote_count"))
         .group_by(Quote.character_id)
@@ -33,7 +27,7 @@ def get_most_quoted_character(
     return None
 
 
-def get_most_quoted_episode(db: Session) -> dict[str, Any] | None:
+def get_most_quoted_episode(db: Session) -> dict[str, Episode | int | None] | None:
     base_query = (
         db.query(Quote.episode_id, func.count(Quote.id).label("quote_count"))
         .group_by(Quote.episode_id)

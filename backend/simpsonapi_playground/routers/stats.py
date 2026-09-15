@@ -1,4 +1,3 @@
-from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -7,6 +6,8 @@ from simpsonapi_playground.crud.stats import (
     get_most_quoted_character,
     get_most_quoted_episode,
 )
+from simpsonapi_playground.models.character import Character
+from simpsonapi_playground.models.episode import Episode
 from simpsonapi_playground.schemas.shared_schemas import (
     StatsCharacterMostQuoted,
     StatsEpisodeMostQuoted,
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 @router.get("/character/most-quoted", response_model=StatsCharacterMostQuoted)
 def most_quoted_character(
     db: Session = Depends(get_db),
-) -> dict[str, Any] | None:
+) -> dict[str, Character | int | None] | None:
     quoted_char = get_most_quoted_character(db)
     if not quoted_char:
         return None
@@ -26,7 +27,9 @@ def most_quoted_character(
 
 
 @router.get("/episode/most-quoted", response_model=StatsEpisodeMostQuoted)
-def most_quoted_episode(db: Session = Depends(get_db)) -> dict[str, Any] | None:
+def most_quoted_episode(
+    db: Session = Depends(get_db),
+) -> dict[str, Episode | int | None] | None:
     quoted_episode = get_most_quoted_episode(db)
     if not quoted_episode:
         return None

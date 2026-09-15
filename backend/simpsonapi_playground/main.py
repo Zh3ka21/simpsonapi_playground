@@ -7,18 +7,11 @@ from simpsonapi_playground.routers.quotes import router as quotes_router
 from simpsonapi_playground.routers.seasons import router as seasons_router
 from simpsonapi_playground.routers.stats import router as stats_router
 
-
-app = FastAPI()
-
-app.include_router(character_router)
-app.include_router(actor_router)
-app.include_router(episode_router)
-app.include_router(catchphrase_router)
-app.include_router(quotes_router)
-app.include_router(seasons_router)
-app.include_router(stats_router)
-
-app = FastAPI(title="OpenAPI Playground")
+app = FastAPI(
+    title="SimpsonAPI Playground",
+    description="A REST API for exploring The Simpsons universe.",
+    version="1.0.0",
+)
 
 app.include_router(character_router)
 app.include_router(actor_router)
@@ -31,4 +24,4 @@ app.include_router(stats_router)
 
 @app.get("/")
 def root() -> dict[str, str]:
-    return {"message": "Hello from OpenAPI Playground"}
+    return {"message": "Hello from Simpson OpenAPI Playground"}

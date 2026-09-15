@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, Literal
+from typing import Dict, List, Literal
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -24,7 +24,7 @@ from simpsonapi_playground.schemas.characters_schemas import PaginatedCharacters
 router = APIRouter(prefix="/actors", tags=["actors"])
 
 
-@router.post("/", response_model=ActorSchema)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ActorSchema)
 def create_an_actor(actor: ActorCreate, db: Session = Depends(get_db)) -> ActorSchema:
     new_actor = create_actor(db, actor)
     if new_actor is None:
@@ -39,7 +39,7 @@ def read_all_actors(
     offset: int = Query(0, ge=0),
     sort: str = Query("id", pattern="^(id|first_name|last_name|cast)$"),
     order: Literal["asc", "desc"] = Query("asc", pattern="^(asc|desc)$"),
-) -> Dict[str, Any]:
+) -> Dict[str, List[Actor] | int]:
     items, total = read_actors(db, limit=limit, offset=offset, sort=sort, order=order)
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
@@ -52,7 +52,7 @@ def read_an_actor(actor_id: UUID, db: Session = Depends(get_db)) -> ActorSchema:
     return ActorSchema.model_validate(actor)
 
 
-@router.put("/{actor_id}", response_model=ActorSchema)
+@router.put("/{actor_id}", status_code=status.HTTP_200_OK, response_model=ActorSchema)
 def upd_actor(
     actor_id: UUID, data: ActorCreate, db: Session = Depends(get_db)
 ) -> Actor | None:
@@ -88,7 +88,7 @@ def get_characters_played_by_actor(
     db: Session = Depends(get_db),
     limit: int = Query(10, ge=1, le=20),
     offset: int = Query(0, ge=0),
-) -> Dict[str, Any]:
+) -> Dict[str, List[Character] | int]:
     items, total = get_characters_based_on_actor(
         db, actor_id, limit=limit, offset=offset
     )

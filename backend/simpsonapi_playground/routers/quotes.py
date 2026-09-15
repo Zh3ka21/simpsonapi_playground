@@ -1,10 +1,11 @@
-from typing import Any
+from typing import List
 from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from simpsonapi_playground.core.session import get_db
 from simpsonapi_playground.crud.quotes import get_quotes_for_episode, import_quotes
+from simpsonapi_playground.models.quote import Quote
 from simpsonapi_playground.schemas.quotes_schemas import (
     PaginatedQuotesResponse,
     QuoteCreate,
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/quotes", tags=["quotes"])
 @router.get("/{episode_id}", response_model=PaginatedQuotesResponse)
 def get_quotes_for_episode_router(
     episode_id: UUID, db: Session = Depends(get_db), limit: int = 10, offset: int = 0
-) -> dict[str, Any]:
+) -> dict[str, List[Quote] | int]:
     return get_quotes_for_episode(db, episode_id, limit=limit, offset=offset)
 
 

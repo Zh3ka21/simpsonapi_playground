@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from uuid import UUID
+from pydantic import Field
 
 from simpsonapi_playground.schemas.seasons_schemas import SeasonBase
 from simpsonapi_playground.schemas.quotes_schemas import QuoteBase
@@ -32,6 +33,6 @@ class PaginatedEpisodes(BaseModel):
 class EpisodeResponse(EpisodeBase):
     id: UUID
     season: Optional[SeasonBase] = None
-    quotes: List[QuoteBase] = []
+    quotes: list[QuoteBase] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
