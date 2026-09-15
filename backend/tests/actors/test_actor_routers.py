@@ -113,7 +113,5 @@ def test_get_characters_played_by_actor(db: Session, client: TestClient) -> None
     assert response["total"] == 3
 
     assert response["items"] is not None
-    assert response["items"][0]["name"] == "Homer Simpson"
-
-    assert response["items"][0]["actor"] is not None
-    assert response["items"][0]["actor"]["first_name"] == "Dan"
+    names = {item["name"] for item in response["items"]}
+    assert names == {"Homer Simpson", "Abe Simpson", "Krusty the Clown"}

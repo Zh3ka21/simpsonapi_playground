@@ -1,41 +1,8 @@
-from os import name
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-
-from simpsonapi_playground.crud.actor import create_actor
-from simpsonapi_playground.crud.character import create_character
-from simpsonapi_playground.schemas.actors_schemas import ActorCreate
-from simpsonapi_playground.schemas.characters_schemas import CharacterCreate
 
 
 def test_create_character_api(client: TestClient) -> None:
-    payload: dict[str, str | int] = {
-        "name": "Homer Simpson",
-        "actor_id": 1,
-    }
-
-    res = client.post("/characters/", json=payload)
-    assert res.status_code == 201
-
-    data: dict[str, object] = res.json()
-    assert data["name"] == "Homer Simpson"
-    assert data["id"] is not None
-
-
-def test_get_character_api(client: TestClient) -> None:
-    payload: dict[str, str | int] = {
-        "name": "Homer Simpson",
-        "actor_id": 1,
-    }
-    create: dict[str, object] = client.post("/characters/", json=payload).json()
-
-    res = client.get(f"/characters/{create['id']}")
-    assert res.status_code == 200
-    assert res.json()["name"] == "Homer Simpson"
-
-
-def test_update_character_api(client: TestClient) -> None:
-    _ = client.post(
+    actor = client.post(
         "/actors/",
         json={
             "first_name": "Dan",
@@ -44,11 +11,57 @@ def test_update_character_api(client: TestClient) -> None:
         },
     ).json()
 
-    create: dict[str, object] = client.post(
+    payload = {
+        "name": "Homer Simpson",
+        "actor_id": actor["id"],
+    }
+
+    res = client.post("/characters/", json=payload)
+    assert res.status_code == 201
+
+    data = res.json()
+    assert data["name"] == "Homer Simpson"
+    assert data["id"] is not None
+
+
+def test_get_character_api(client: TestClient) -> None:
+    actor = client.post(
+        "/actors/",
+        json={
+            "first_name": "Dan",
+            "last_name": "Castellaneta",
+            "cast": "Main",
+        },
+    ).json()
+
+    create = client.post(
         "/characters/",
         json={
             "name": "Homer Simpson",
-            "actor_id": 1,
+            "actor_id": actor["id"],
+        },
+    ).json()
+
+    res = client.get(f"/characters/{create['id']}")
+    assert res.status_code == 200
+    assert res.json()["name"] == "Homer Simpson"
+
+
+def test_update_character_api(client: TestClient) -> None:
+    actor = client.post(
+        "/actors/",
+        json={
+            "first_name": "Dan",
+            "last_name": "Castellaneta",
+            "cast": "Main",
+        },
+    ).json()
+
+    create = client.post(
+        "/characters/",
+        json={
+            "name": "Homer Simpson",
+            "actor_id": actor["id"],
         },
     ).json()
 
@@ -56,7 +69,7 @@ def test_update_character_api(client: TestClient) -> None:
         f"/characters/{create['id']}",
         json={
             "name": "Krusty the Clown",
-            "actor_id": 1,
+            "actor_id": actor["id"],
         },
     )
 
@@ -65,7 +78,7 @@ def test_update_character_api(client: TestClient) -> None:
 
 
 def test_delete_character_api(client: TestClient) -> None:
-    actors_req = client.post(
+    actor = client.post(
         "/actors/",
         json={
             "first_name": "Dan",
@@ -74,16 +87,16 @@ def test_delete_character_api(client: TestClient) -> None:
         },
     ).json()
 
-    cr_character = client.post(
+    character = client.post(
         "/characters/",
         json={
             "name": "Homer Simpson",
-            "actor_id": actors_req["id"],
+            "actor_id": actor["id"],
         },
     ).json()
 
-    res = client.delete(f"/characters/{cr_character['id']}")
+    res = client.delete(f"/characters/{character['id']}")
     assert res.status_code == 204
 
-    res = client.get(f"/characters/{cr_character['id']}")
+    res = client.get(f"/characters/{character['id']}")
     assert res.status_code == 404
